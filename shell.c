@@ -14,7 +14,7 @@
 #include "globals.h"
 #include "pwd.h"
 #include "cd.h"
-
+#include "echo.h"
 
 char shellPWD[1024];
 char shellHome[1024];
@@ -73,10 +73,11 @@ void commandLoop()
 
         if (!strcmp(command, "cd"))
             cd();
-        // else if (!strcmp(command, "echo"))
-        //     echo();
+        if (!strcmp(command, "echo"))
+            echo();
         if (!strcmp(command, "pwd"))
             pwd();
+            
         // else if (!strcmp(command, "ls"))
             // ls();
         // else if (!strcmp(command, "pinfo"))
