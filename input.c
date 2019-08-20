@@ -12,10 +12,10 @@
 #include <dirent.h>
 #include "globals.h"
 
-char* input;
-char* command;
-char* flags;
-char* arguments;
+char *input;
+char *command;
+char *flags;
+char *arguments;
 
 void Input()
 {
@@ -58,13 +58,13 @@ void Input()
 
     strcat(command, arr[0]);
 
-    for (i=1; i<=j && arr[i][0]=='-'; i++)
+    for (i = 1; i <= j && arr[i][0] == '-'; i++)
     {
         strcat(flags, arr[i]);
         strcat(flags, " ");
-    }    
+    }
 
-    for (i; i<=j; i++)
+    for (i; i <= j; i++)
     {
         strcat(arguments, arr[i]);
         strcat(arguments, " ");
