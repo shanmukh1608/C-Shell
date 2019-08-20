@@ -13,6 +13,8 @@
 #include "input.h"
 #include "globals.h"
 #include "pwd.h"
+#include "cd.h"
+
 
 char shellPWD[1024];
 char shellHome[1024];
@@ -43,12 +45,13 @@ void prompt()
         if (!strcmp(shellPWD, shellHome)) //at home directory
             strcpy(shellPWD, "~");
 
-        else if (strlen(shellPWD) > strlen(shellHome)) //at subdirectory of home
+        else if (strstr(shellPWD, shellHome)) //at subdirectory of home
         {
             char *temp = malloc(strlen(shellPWD));
             strcpy(temp, shellPWD);
             strcpy(shellPWD, "~");
             int homeLength = strlen(shellHome);
+            // printf("Shellhome=%s, homelength=%d, temp=%s, templength=%d", shellHome, homeLength, temp, strlen(temp));
             for (int i = homeLength; i < strlen(temp); i++)
                 shellPWD[i - homeLength + 1] = temp[i];
             shellPWD[strlen(temp) - homeLength + 1] = '\0';
@@ -68,8 +71,8 @@ void commandLoop()
         printf("%s", shellPrompt);
         Input();
 
-        // if (!strcmp(command, "cd"))
-        //     cd();
+        if (!strcmp(command, "cd"))
+            cd();
         // else if (!strcmp(command, "echo"))
         //     echo();
         if (!strcmp(command, "pwd"))
@@ -80,9 +83,9 @@ void commandLoop()
             // pinfo();
         // else
             // executeCommand();
+        // printf("\nCommand=%s length=%d\nFlags=%s length=%d\nArguments=%s length=%d\n", command, strlen(command), flags, strlen(flags), arguments, strlen(arguments));
     }
 
-    // printf("\n%s\n%s\n%s\n", command, flags, arguments);
 }
 
 int main()

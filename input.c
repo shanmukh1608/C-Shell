@@ -34,39 +34,58 @@ void Input()
     }
 
     int i = 0, j = 0;
-    char **arr = (char **)malloc(100 * sizeof(char *));
-    for (int k = 0; k < 100; k++)
-        arr[k] = (char *)malloc(1024);
-
-    while (i < strlen(input))
-    {
-        while (input[i] != ' ' && i < strlen(input))
-        {
-            char cToStr[2];
-            cToStr[1] = '\0';
-            cToStr[0] = input[i];
-            strcat(arr[j], cToStr);
-            i++;
-        }
-
-        i++, j++;
-    }
 
     command = (char *)malloc(1024 * sizeof(char));
     flags = (char *)malloc(1024 * sizeof(char));
     arguments = (char *)malloc(1024 * sizeof(char));
 
-    strcat(command, arr[0]);
+    while (i < strlen(input) && input[i] == ' ')
+        i++;
 
-    for (i = 1; i <= j && arr[i][0] == '-'; i++)
+    while (i < strlen(input) && input[i] != ' ')
     {
-        strcat(flags, arr[i]);
-        strcat(flags, " ");
+        char cToStr[2];
+        cToStr[1] = '\0';
+        cToStr[0] = input[i];
+        strcat(command, cToStr);
+        i++;
     }
 
-    for (i; i <= j; i++)
+    while (i < strlen(input) && input[i] == ' ')
+        i++;
+
+    while (i < strlen(input))
     {
-        strcat(arguments, arr[i]);
-        strcat(arguments, " ");
+        if (input[i] == '-')
+        {
+            char cToStr[1024];
+            j = 0;
+
+            while (i < strlen(input) && input[i] != ' ')
+                cToStr[j++] = input[i++];
+
+            cToStr[j] = ' ';
+            cToStr[j + 1] = '\0';
+            strcat(flags, cToStr);
+        }
+
+        else if (input[i] == ' ')
+            i++;
+
+        else
+            break;
+    }
+
+    int end;
+    for (end = strlen(input) - 1; end >= i && input[end] == ' '; end--)
+        ;
+
+    while (i <= end)
+    {
+        char cToStr[2];
+        cToStr[1] = '\0';
+        cToStr[0] = input[i];
+        strcat(arguments, cToStr);
+        i++;
     }
 }
