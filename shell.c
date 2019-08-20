@@ -10,10 +10,13 @@
 #include <unistd.h>
 #include <errno.h>
 #include <dirent.h>
+#include "input.h"
+#include "globals.h"
 
 char shellPWD[1024];
 char shellHome[1024];
 char *shellPrompt;
+char *input;
 
 void prompt()
 {
@@ -36,7 +39,6 @@ void prompt()
     //To check if PWD is at home, at subdirectory of home, or superdirectory of home
     if (getcwd(shellPWD, sizeof(shellPWD)) != NULL)
     {
-        strcpy(shellPWD, "/home/shanmukh/Programming/Sem3/CSE-1/");
         if (!strcmp(shellPWD, shellHome)) //at home directory
             strcpy(shellPWD, "~");
 
@@ -61,6 +63,8 @@ void commandLoop()
 {
     prompt();
     printf("%s", shellPrompt);
+    Input();
+    printf("\n%s\n%s\n%s\n", command, flags, arguments);
 }
 
 int main()
