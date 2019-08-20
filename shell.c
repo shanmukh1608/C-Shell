@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include "input.h"
 #include "globals.h"
+#include "pwd.h"
 
 char shellPWD[1024];
 char shellHome[1024];
@@ -61,10 +62,27 @@ void prompt()
 
 void commandLoop()
 {
-    prompt();
-    printf("%s", shellPrompt);
-    Input();
-    printf("\n%s\n%s\n%s\n", command, flags, arguments);
+    while (1)
+    {
+        prompt();
+        printf("%s", shellPrompt);
+        Input();
+
+        // if (!strcmp(command, "cd"))
+        //     cd();
+        // else if (!strcmp(command, "echo"))
+        //     echo();
+        if (!strcmp(command, "pwd"))
+            pwd();
+        // else if (!strcmp(command, "ls"))
+            // ls();
+        // else if (!strcmp(command, "pinfo"))
+            // pinfo();
+        // else
+            // executeCommand();
+    }
+
+    // printf("\n%s\n%s\n%s\n", command, flags, arguments);
 }
 
 int main()
