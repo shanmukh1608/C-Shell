@@ -16,11 +16,14 @@
 #include "cd.h"
 #include "echo.h"
 #include "ls.h"
+#include "pinfo.h"
 
-
+char state;
+int vm_result;
 char shellPWD[1024];
 char shellHome[1024];
 char mon[4];
+int main_pid;
 char *shellPrompt;
 char *input;
 char *currCommand;
@@ -101,8 +104,10 @@ void commandLoop()
                 pwd();
             else if (!strcmp(command, "ls"))
                 ls();
-            else
-                execInput();
+            else if (!strcmp(command, "pinfo"))
+                pinfo();
+            // else
+            //     execInput();
             currCommand = strtok(NULL, ";");
         }
     }
@@ -118,6 +123,7 @@ int main()
         return 1;
     }
 
+    main_pid = (int)getpid();
     commandLoop();
     return 0;
 }
