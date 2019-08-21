@@ -16,60 +16,47 @@ char *input;
 char *command;
 char *flags;
 char *arguments;
+char *currCommand;
 
-void Input()
+void parseInput()
 {
-    input = (char *)malloc(1024 * sizeof(char));
-    while (1)
-    {
-        char ch;
-        scanf("%c", &ch);
-        if (ch == '\n')
-            break;
-
-        char cToStr[2];
-        cToStr[1] = '\0';
-        cToStr[0] = ch;
-        strcat(input, cToStr);
-    }
-
     int i = 0, j = 0;
 
     command = (char *)malloc(1024 * sizeof(char));
     flags = (char *)malloc(1024 * sizeof(char));
     arguments = (char *)malloc(1024 * sizeof(char));
 
-    while (i < strlen(input) && input[i] == ' ')
+    while (i < strlen(currCommand) && currCommand[i] == ' ')
         i++;
 
-    while (i < strlen(input) && input[i] != ' ')
+    while (i < strlen(currCommand) && currCommand[i] != ' ')
     {
         char cToStr[2];
         cToStr[1] = '\0';
-        cToStr[0] = input[i];
+        cToStr[0] = currCommand[i];
         strcat(command, cToStr);
         i++;
     }
 
-    while (i < strlen(input) && input[i] == ' ')
+    while (i < strlen(currCommand) && currCommand[i] == ' ')
         i++;
 
-    while (i < strlen(input))
+    while (i < strlen(currCommand))
     {
-        if (input[i] == '-')
+        if (currCommand[i] == '-')
         {
             char cToStr[1024];
             j = 0;
 
-            while (i < strlen(input) && input[i] != ' ')
-                cToStr[j++] = input[i++];
+            while (i < strlen(currCommand) && currCommand[i] != ' ')
+                cToStr[j++] = currCommand[i++];
 
             cToStr[j] = ' ';
             cToStr[j + 1] = '\0';
             strcat(flags, cToStr);
         }
 
-        else if (input[i] == ' ')
+        else if (currCommand[i] == ' ')
             i++;
 
         else
@@ -77,15 +64,17 @@ void Input()
     }
 
     int end;
-    for (end = strlen(input) - 1; end >= i && input[end] == ' '; end--)
+    for (end = strlen(currCommand) - 1; end >= i && currCommand[end] == ' '; end--)
         ;
 
     while (i <= end)
     {
         char cToStr[2];
         cToStr[1] = '\0';
-        cToStr[0] = input[i];
+        cToStr[0] = currCommand[i];
         strcat(arguments, cToStr);
         i++;
     }
+
+    // printf("%s\n%s%lld\n%s\n", command, flags, strlen(flags), arguments);
 }

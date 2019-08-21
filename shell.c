@@ -15,11 +15,15 @@
 #include "pwd.h"
 #include "cd.h"
 #include "echo.h"
+#include "ls.h"
+
 
 char shellPWD[1024];
 char shellHome[1024];
+char mon[4];
 char *shellPrompt;
 char *input;
+char *currCommand;
 
 void prompt()
 {
@@ -69,24 +73,39 @@ void commandLoop()
     {
         prompt();
         printf("%s", shellPrompt);
-        Input();
+        input = (char *)malloc(1024 * sizeof(char));
+        while (1)
+        {
+            char ch;
+            scanf("%c", &ch);
+            if (ch == '\n')
+                break;
 
-        if (!strcmp(command, "cd"))
-            cd();
-        if (!strcmp(command, "echo"))
-            echo();
-        if (!strcmp(command, "pwd"))
-            pwd();
-            
-        // else if (!strcmp(command, "ls"))
-            // ls();
-        // else if (!strcmp(command, "pinfo"))
-            // pinfo();
-        // else
-            // executeCommand();
-        // printf("\nCommand=%s length=%d\nFlags=%s length=%d\nArguments=%s length=%d\n", command, strlen(command), flags, strlen(flags), arguments, strlen(arguments));
+            char cToStr[2];
+            cToStr[1] = '\0';
+            cToStr[0] = ch;
+            strcat(input, cToStr);
+        }
+
+        currCommand = strtok(input, ";");
+
+        while (currCommand != NULL)
+        {
+            parseInput(currCommand);
+            // printf("%s\n", command);
+            if (!strcmp(command, "cd"))
+                cd();
+            else if (!strcmp(command, "echo"))
+                echo();
+            else if (!strcmp(command, "pwd"))
+                pwd();
+            else if (!strcmp(command, "ls"))
+                ls();
+            else
+                execInput();
+            currCommand = strtok(NULL, ";");
+        }
     }
-
 }
 
 int main()
