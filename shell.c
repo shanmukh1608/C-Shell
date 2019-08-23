@@ -18,7 +18,6 @@
 #include "ls.h"
 #include "pinfo.h"
 #include "execInput.h"
-#include "exitStatus.h"
 
 char state;
 int vm_result;
@@ -81,13 +80,11 @@ void commandLoop()
     {
         int status;
         prompt();
-        // exitStatus();
         printf("%s", shellPrompt);
 
         input = (char *)malloc(1024 * sizeof(char));
         while (1)
         {
-            // exitStatus();
             char ch;
             scanf("%c", &ch);
             if (ch == '\n')
@@ -98,13 +95,11 @@ void commandLoop()
             cToStr[0] = ch;
             strcat(input, cToStr);
         }
-        // exitStatus();
         currCommand = strtok(input, ";");
 
         while (currCommand != NULL)
         {
             parseInput(currCommand);
-            // printf("%s\n", command);
             if (!strcmp(command, "cd"))
                 cd();
             else if (!strcmp(command, "echo"))
@@ -119,7 +114,6 @@ void commandLoop()
                 execInput();
 
             currCommand = strtok(NULL, ";");
-            // exitStatus();
         }
     }
 }
