@@ -106,10 +106,10 @@ void commandLoop()
                 echo();
             else if (!strcmp(command, "pwd"))
                 pwd();
-            else if (!strcmp(command, "ls"))
-                ls();
             else if (!strcmp(command, "pinfo"))
                 pinfo();
+            else if (!strcmp(command, "ls"))
+                ls();
             else
                 execInput();
 

@@ -20,7 +20,6 @@ void proc_info()
     filelink = (char *)malloc(1024);
     strcat(filelink, "/proc/");
     char pid_string[1024];
-    //printf("%s\n", parsed[current_command].arguments[0]);
 
     if (strcmp(arguments, ""))
         strcat(filelink, arguments);
@@ -36,25 +35,36 @@ void proc_info()
     char line[1024];
 
     fgets(line, 1024, file);
-    char *info;
-    info = (char *)malloc(1024);
-    info = strtok(line, " ");
-    int count = 1;
-    while (count < 3 && info != NULL)
+    int count = 1, i = 0;
+
+    while (count < 3 && i < strlen(line))
     {
-        info = strtok(NULL, " ");
-        count++;
+        if (line[i] == ' ')
+            count++;
+        i++;
     }
 
-    state = info[0];
+    state = line[i];
 
-    while (count < 23 && info != NULL)
+    while (count < 23 && i < strlen(line))
     {
-        info = strtok(NULL, " ");
-        count++;
+        if (line[i] == ' ')
+            count++;
+        i++;
     }
 
-    vm_result = atoi(info);
+    char vm[1024];
+
+    while (line[i] != ' ')
+    {
+        char cToStr[2];
+        cToStr[1] = '\0';
+        cToStr[0] = line[i];
+        strcat(vm, cToStr);
+        i++;
+    }
+
+    vm_result = atoi(vm);
 
     fclose(file);
     return;
@@ -104,6 +114,4 @@ void pinfo()
         buf[i] = '\0';
     readlink(link, buf, 1024);
     printf("%s\n", buf);
-    //printf("%s\n", buf);
-    // printf("\n");
 }
