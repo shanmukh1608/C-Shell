@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include "globals.h"
 
+int backgroundFlag;
 char *input;
 char *command;
 char *flags;
@@ -41,9 +42,14 @@ void parseInput()
     while (i < strlen(currCommand) && currCommand[i] == ' ')
         i++;
 
+    int curr = i;
     while (i < strlen(currCommand))
     {
-        if (currCommand[i] == '-')
+        if (i == curr)
+            if (isDigit(currCommand[i]))
+                break;
+
+        if (currCommand[i] == '-' || isDigit(currCommand[i]))
         {
             char cToStr[1024];
             j = 0;
@@ -63,9 +69,13 @@ void parseInput()
             break;
     }
 
+    flags[strlen(flags) - 1] = '\0';
+    backgroundFlag = 0;
+
     int end;
-    for (end = strlen(currCommand) - 1; end >= i && currCommand[end] == ' '; end--)
-        ;
+    for (end = strlen(currCommand) - 1; end >= i && (currCommand[end] == ' ' || currCommand[end] == '&'); end--)
+        if (currCommand[end] == '&')
+            backgroundFlag = 1;
 
     while (i <= end)
     {
@@ -76,5 +86,5 @@ void parseInput()
         i++;
     }
 
-    // printf("%s\n%s%lld\n%s\n", command, flags, strlen(flags), arguments);
+    // printf("%s\n%s\n%s\n%d\n", command, flags, arguments, backgroundFlag);
 }

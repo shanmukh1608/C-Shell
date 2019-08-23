@@ -14,84 +14,109 @@
 #include <time.h>
 #include "globals.h"
 
-int isNOTDIR(const char* name)
+int isNOTDIR(const char *name)
 {
-    DIR* directory = opendir(name);
+	DIR *directory = opendir(name);
 
-    if(directory != NULL)
-    {
-     closedir(directory);
-     return 0;
-    }
+	if (directory != NULL)
+	{
+		closedir(directory);
+		return 0;
+	}
 
-    if(errno == ENOTDIR)
-    {
-     return 1;
-    }
+	if (errno == ENOTDIR)
+	{
+		return 1;
+	}
 
-    return -1;
+	return -1;
 }
 
-int isFile(char* file){
-    struct stat fil;
-    return (stat(file, &fil) == 0);
+int isFile(char *file)
+{
+	struct stat fil;
+	return (stat(file, &fil) == 0);
 }
 
-int isHiddenFile(char* file){
-	return (file[0]==46);
+int isHiddenFile(char *file)
+{
+	return (file[0] == 46);
 }
 
-void Mon(int num){
+int isDigit(char c)
+{
+	if (c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9')
+		return 1;
+	return 0;
+}
+
+void Mon(int num)
+{
 	switch (num)
 	{
-		case 1: strcpy(mon, "Jan");
-				break;
-		case 2: strcpy(mon, "Feb");
-				break;
-		case 3: strcpy(mon, "Mar");
-				break;
-		case 4: strcpy(mon, "Apr");
-				break;
-		case 5: strcpy(mon, "May");
-				break;
-		case 6: strcpy(mon, "Jun");
-				break;
-		case 7: strcpy(mon, "Jul");
-				break;
-		case 8: strcpy(mon, "Aug");
-				break;
-		case 9: strcpy(mon, "Sep");
-				break;
-		case 10: strcpy(mon, "Oct");
-				break;
-		case 11: strcpy(mon, "Nov");
-				break;
-		case 12: strcpy(mon, "Dec");
-				break;
+	case 1:
+		strcpy(mon, "Jan");
+		break;
+	case 2:
+		strcpy(mon, "Feb");
+		break;
+	case 3:
+		strcpy(mon, "Mar");
+		break;
+	case 4:
+		strcpy(mon, "Apr");
+		break;
+	case 5:
+		strcpy(mon, "May");
+		break;
+	case 6:
+		strcpy(mon, "Jun");
+		break;
+	case 7:
+		strcpy(mon, "Jul");
+		break;
+	case 8:
+		strcpy(mon, "Aug");
+		break;
+	case 9:
+		strcpy(mon, "Sep");
+		break;
+	case 10:
+		strcpy(mon, "Oct");
+		break;
+	case 11:
+		strcpy(mon, "Nov");
+		break;
+	case 12:
+		strcpy(mon, "Dec");
+		break;
 	}
 }
 
 int digits(int num)
 {
 	int count = 0;
-	while(num != 0)
-    {
-        count++;
-        num /= 10;
-    }
-    return count;
+	while (num != 0)
+	{
+		count++;
+		num /= 10;
+	}
+	return count;
 }
 
 int is_large(char c)
 {
-	return ((c<91)&&(64<c));
+	return ((c < 91) && (64 < c));
 }
 
-void swap(char *x, char *y) {
-	char t = *x; *x = *y; *y = t;
+void swap(char *x, char *y)
+{
+	char t = *x;
+	*x = *y;
+	*y = t;
 }
 
-char* reverse(char *buffer, int i, int j)
+char *reverse(char *buffer, int i, int j)
 {
 	while (i < j)
 		swap(&buffer[i++], &buffer[j--]);
@@ -99,7 +124,7 @@ char* reverse(char *buffer, int i, int j)
 	return buffer;
 }
 
-char* itoa(int value, char* buffer, int base)
+char *itoa(int value, char *buffer, int base)
 {
 	if (base < 2 || base > 32)
 		return buffer;
@@ -110,7 +135,7 @@ char* itoa(int value, char* buffer, int base)
 	{
 		int r = n % base;
 
-		if (r >= 10) 
+		if (r >= 10)
 			buffer[i++] = 65 + (r - 10);
 		else
 			buffer[i++] = 48 + r;

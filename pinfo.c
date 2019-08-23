@@ -27,7 +27,7 @@ void proc_info()
     else
     {
         char pid_string[1024];
-        itoa(main_pid, pid_string, 10);
+        itoa(mainPID, pid_string, 10);
         strcat(filelink, pid_string);
     }
 
@@ -63,7 +63,7 @@ void proc_info()
 void pinfo()
 {
     if (!strcmp(arguments, ""))
-        printf("pid -- %d\n", main_pid);
+        printf("pid -- %d\n", mainPID);
 
     else
     {
@@ -87,14 +87,14 @@ void pinfo()
     link = (char *)malloc(1024);
     strcpy(link, "/proc/");
 
-    if (strcmp(arguments, ""))
-        strcat(link, arguments);
-    else
+    if (!strcmp(arguments, ""))
     {
         char pid_string[1024];
-        itoa(main_pid, pid_string, 10);
+        itoa(mainPID, pid_string, 10);
         strcat(link, pid_string);
     }
+    else
+        strcat(link, arguments);
 
     strcat(link, "/exe");
     int i;

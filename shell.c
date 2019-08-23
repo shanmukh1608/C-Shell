@@ -17,13 +17,18 @@
 #include "echo.h"
 #include "ls.h"
 #include "pinfo.h"
+#include "execInput.h"
+#include "exitStatus.h"
 
 char state;
 int vm_result;
 char shellPWD[1024];
 char shellHome[1024];
 char mon[4];
-int main_pid;
+int mainPID;
+int pidTop;
+int pidStack[1024];
+char processStack[1024][1024];
 char *shellPrompt;
 char *input;
 char *currCommand;
@@ -74,11 +79,15 @@ void commandLoop()
 {
     while (1)
     {
+        int status;
         prompt();
+        // exitStatus();
         printf("%s", shellPrompt);
+
         input = (char *)malloc(1024 * sizeof(char));
         while (1)
         {
+            // exitStatus();
             char ch;
             scanf("%c", &ch);
             if (ch == '\n')
@@ -89,7 +98,7 @@ void commandLoop()
             cToStr[0] = ch;
             strcat(input, cToStr);
         }
-
+        // exitStatus();
         currCommand = strtok(input, ";");
 
         while (currCommand != NULL)
@@ -106,9 +115,11 @@ void commandLoop()
                 ls();
             else if (!strcmp(command, "pinfo"))
                 pinfo();
-            // else
-            //     execInput();
+            else
+                execInput();
+
             currCommand = strtok(NULL, ";");
+            // exitStatus();
         }
     }
 }
@@ -123,7 +134,10 @@ int main()
         return 1;
     }
 
-    main_pid = (int)getpid();
+    mainPID = (int)getpid();
+    strcpy(processStack[pidTop], "shell");
+    pidStack[pidTop] = mainPID;
+    pidTop++;
     commandLoop();
     return 0;
 }

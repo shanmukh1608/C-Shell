@@ -15,24 +15,24 @@
 #include <grp.h>
 #include <pwd.h>
 
-void full_ls_file(char* filename, int a, int max)
+void full_ls_file(char *filename, int a, int max)
 {
     struct stat fileStat;
-    
-    if(stat(filename,&fileStat) < 0)    
+
+    if (stat(filename, &fileStat) < 0)
         return;
 
     char permissions[10] = "";
-    strcat(permissions, ( (S_ISDIR(fileStat.st_mode)) ? "d" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IRUSR) ? "r" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IWUSR) ? "w" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IXUSR) ? "x" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IRGRP) ? "r" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IWGRP) ? "w" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IXGRP) ? "x" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IROTH) ? "r" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IWOTH) ? "w" : "-"));
-    strcat(permissions, ( (fileStat.st_mode & S_IXOTH) ? "x" : "-"));
+    strcat(permissions, ((S_ISDIR(fileStat.st_mode)) ? "d" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IRUSR) ? "r" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IWUSR) ? "w" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IXUSR) ? "x" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IRGRP) ? "r" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IWGRP) ? "w" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IXGRP) ? "x" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IROTH) ? "r" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IWOTH) ? "w" : "-"));
+    strcat(permissions, ((fileStat.st_mode & S_IXOTH) ? "x" : "-"));
 
     struct group *grp;
     struct passwd *pwd;
@@ -42,34 +42,35 @@ void full_ls_file(char* filename, int a, int max)
     t = malloc(1024);
     *t = fileStat.st_mtime;
     struct tm tm = *localtime(t);
-    Mon(tm.tm_mon+1);
+    Mon(tm.tm_mon + 1);
     printf("%s %2ld %s %s %*ld %s %d %d:%02d %s\n", permissions, fileStat.st_nlink, pwd->pw_name, grp->gr_name, max, fileStat.st_size, mon, tm.tm_mday, tm.tm_hour, tm.tm_min, filename);
 }
 
-void full_ls(int a){
+void full_ls(int a)
+{
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
 
-    DIR * curdir1 = opendir(arguments);
+    DIR *curdir1 = opendir(arguments);
     struct dirent *curfile1;
     int max = 0; //store digits of maximum size
     chdir(arguments);
-    while((curfile1 = readdir(curdir1)) != NULL)
+    while ((curfile1 = readdir(curdir1)) != NULL)
     {
         struct stat fileStat1;
-        if(stat(curfile1->d_name,&fileStat1) < 0)    
+        if (stat(curfile1->d_name, &fileStat1) < 0)
             return;
-        if (digits(fileStat1.st_size)>max)
+        if (digits(fileStat1.st_size) > max)
             max = digits(fileStat1.st_size);
     }
     chdir(cwd);
 
     struct dirent *curfile;
-    DIR * curdir = opendir(arguments);
+    DIR *curdir = opendir(arguments);
     chdir(arguments);
-    while((curfile = readdir(curdir)) != NULL)
+    while ((curfile = readdir(curdir)) != NULL)
     {
-        if ((isHiddenFile(curfile->d_name))&&(!a))
+        if ((isHiddenFile(curfile->d_name)) && (!a))
             continue;
         full_ls_file(curfile->d_name, a, max);
     }
@@ -78,7 +79,6 @@ void full_ls(int a){
 
 void regular_ls(int a)
 {
-    
     DIR *curdir = opendir(arguments);
     struct dirent *curfile;
     while ((curfile = readdir(curdir)) != NULL)
@@ -89,7 +89,6 @@ void regular_ls(int a)
     }
     printf("\n");
 }
-
 
 void ls()
 {
@@ -129,7 +128,7 @@ void ls()
     stat(arguments, &path_stat);
 
     if (S_ISDIR(path_stat.st_mode)) //if ls is run on directory
-    {        
+    {
         if (l)
             full_ls(a);
         else

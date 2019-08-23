@@ -16,14 +16,14 @@
 
 void cd()
 {
-    if (!strcmp(arguments, "")||!strcmp(arguments, "~"))
+    if (!strcmp(arguments, "") || !strcmp(arguments, "~"))
         strcpy(arguments, shellHome);
 
-    if (arguments[0]=='~')
+    if (arguments[0] == '~')
     {
-        for(int i=0; i<strlen(arguments)-1; i++)
-            arguments[i]=arguments[i+1];
-        arguments[strlen(arguments)-1]='\0';
+        for (int i = 0; i < strlen(arguments) - 1; i++)
+            arguments[i] = arguments[i + 1];
+        arguments[strlen(arguments) - 1] = '\0';
 
         char temp[1024];
         strcpy(temp, shellHome);
@@ -37,7 +37,6 @@ void cd()
     {
         /* Directory exists. */
         chdir(arguments);
-
     }
     else if (ENOENT == errno)
     {

@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
+#include "globals.h"
+#include "ls.h"
+
+int count = 1;
+char proc_stack[1024][1024];
+
+int execInput()
+{
+    int status;
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        // printf("%s\n%s\n%s\n", command, flags, arguments);
+        char *buf[1024];
+        buf[0] = (char *)malloc(1024);
+        strcpy(buf[0], command);
+
+        int bufSize = 1;
+
+        char *temp;
+        temp = (char *)malloc(1024);
+
+        if (strcmp(flags, ""))
+        {
+            char *flag;
+            flag = (char *)malloc(1024);
+            strcpy(temp, flags);
+            flag = strtok(temp, " ");
+            buf[bufSize] = (char *)malloc(1024);
+            strcpy(buf[bufSize++], flag);
+
+            while (flag != NULL)
+            {
+                flag = strtok(NULL, " ");
+                buf[bufSize] = (char *)malloc(1024);
+                if (flag != NULL)
+                    strcpy(buf[bufSize++], flag);
+            }
+        }
+
+        if (strcmp(arguments, ""))
+        {
+            char *argument;
+            argument = (char *)malloc(1024);
+            strcpy(temp, arguments);
+            argument = strtok(temp, " ");
+            buf[bufSize] = (char *)malloc(1024);
+            strcpy(buf[bufSize++], argument);
+
+            while (argument != NULL)
+            {
+                argument = strtok(NULL, " ");
+                buf[bufSize] = (char *)malloc(1024);
+                if (argument != NULL)
+                    strcpy(buf[bufSize++], argument);
+            }
+        }
+
+        if (!strcmp(arguments, "ls"))
+            ls();
+        else
+        {
+            buf[bufSize] = NULL;
+            if (execvp(command, buf) < 0)
+            {
+                printf("*** ERROR: exec failed\n");
+                exit(1);
+            }
+        }
+        exit(0);
+    }
+
+    else if (pid > 0)
+    {
+        pidStack[pidTop] = pid;
+        strcpy(processStack[pidTop++], command);
+
+        if (backgroundFlag)
+            printf("[%d] %d\n", count++, pid);
+        else
+            waitpid(pid, &status, 0);
+    }
+    else
+    {
+        printf("fork error\n");
+    }
+
+    return status;
+}
