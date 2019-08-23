@@ -18,6 +18,7 @@
 #include "ls.h"
 #include "pinfo.h"
 #include "execInput.h"
+#include "history.h"
 
 char state;
 int vm_result;
@@ -95,11 +96,16 @@ void commandLoop()
             cToStr[0] = ch;
             strcat(input, cToStr);
         }
+
+        char inputCopy[1024];
+        strcpy(inputCopy, input);
         currCommand = strtok(input, ";");
 
         while (currCommand != NULL)
         {
             parseInput(currCommand);
+            writeToHistory(inputCopy); //copy because input has been tokenized
+
             if (!strcmp(command, "cd"))
                 cd();
             else if (!strcmp(command, "echo"))
@@ -110,6 +116,8 @@ void commandLoop()
                 pinfo();
             else if (!strcmp(command, "ls"))
                 ls();
+            else if (!strcmp(command, "history"))
+                history();
             else
                 execInput();
 

@@ -117,13 +117,14 @@ void ls()
 
     int l = 0, a = 0;
 
-    if (!strcmp(flags, "-la ") || !strcmp(flags, "-al ") || !strcmp(flags, "-l -a ") || !strcmp(flags, "-a -l "))
+    if (!strcmp(flags, "-la") || !strcmp(flags, "-al") || !strcmp(flags, "-l -a") || !strcmp(flags, "-a -l"))
         l = 1, a = 1;
-    else if (!strcmp(flags, "-l "))
+    else if (!strcmp(flags, "-l"))
         l = 1;
-    else if (!strcmp(flags, "-a "))
+    else if (!strcmp(flags, "-a"))
         a = 1;
 
+    printf("l=%d, a=%d\n", l, a);
     struct stat path_stat;
     stat(arguments, &path_stat);
 
