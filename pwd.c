@@ -16,6 +16,13 @@
 void pwd()
 {
     char currDir[1024];
+
+    if (strcmp(arguments, ""))
+    {
+        printf("pwd: Too many arguments\n");
+        return;
+    }
+
     if (getcwd(currDir, sizeof(currDir)) != NULL)
         printf("%s\n", currDir);
     else
