@@ -16,17 +16,5 @@
 
 void echo()
 {
-    char *argument;
-    argument = (char *)malloc(1024);
-    char *temp;
-    temp = (char *)malloc(1024);
-    strcpy(temp, arguments);
-    argument = strtok(temp, " ");
-
-    while (argument != NULL)
-    {
-        printf("%s ", argument);
-        argument = strtok(NULL, " ");
-    }
-    printf("\n");
+    printf("%s\n", arguments);
 }

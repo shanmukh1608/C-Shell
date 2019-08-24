@@ -100,7 +100,7 @@ void commandLoop()
         }
 
         char inputCopy[1024];
-        strcpy(inputCopy, input);
+        strcpy(inputCopy,input);
         currCommand = strtok(input, ";");
 
         while (currCommand != NULL)
