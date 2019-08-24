@@ -124,7 +124,6 @@ void ls()
     else if (!strcmp(flags, "-a"))
         a = 1;
 
-    printf("l=%d, a=%d\n", l, a);
     struct stat path_stat;
     stat(arguments, &path_stat);
 

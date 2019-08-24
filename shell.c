@@ -19,6 +19,7 @@
 #include "pinfo.h"
 #include "execInput.h"
 #include "history.h"
+#include "nightswatch.h"
 
 char state;
 int vm_result;
@@ -81,7 +82,8 @@ void commandLoop()
     {
         int status;
         prompt();
-        printf("%s", shellPrompt);
+        // printf("%s", shellPrompt);
+        printf ("\033[0;1;34m%s\033[0m", shellPrompt);
 
         input = (char *)malloc(1024 * sizeof(char));
         while (1)
@@ -118,6 +120,8 @@ void commandLoop()
                 ls();
             else if (!strcmp(command, "history"))
                 history();
+            else if (!strcmp(command, "nightswatch"))
+                nightswatch();
             else
                 execInput();
 
