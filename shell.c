@@ -122,6 +122,8 @@ void commandLoop()
                 history();
             else if (!strcmp(command, "nightswatch"))
                 nightswatch();
+            else if (!strcmp(command, "exit"))
+                exit(0);
             else
                 execInput();
 
