@@ -46,51 +46,27 @@ int execInput()
         // printf("%s\n%s\n%s\n", command, flags, arguments);
         char *buf[1024];
         buf[0] = (char *)malloc(1024);
-        strcpy(buf[0], command);
+        strcpy(buf[0], Commands[currCommand].command);
 
         int bufSize = 1;
 
         char *temp;
         temp = (char *)malloc(1024);
 
-        if (strcmp(flags, ""))
+        for (int i=0; i<Commands[currCommand].flagsIndex; i++)
         {
-            char *flag;
-            flag = (char *)malloc(1024);
-            strcpy(temp, flags);
-            flag = strtok(temp, " ");
             buf[bufSize] = (char *)malloc(1024);
-            strcpy(buf[bufSize++], flag);
-
-            while (flag != NULL)
-            {
-                flag = strtok(NULL, " ");
-                buf[bufSize] = (char *)malloc(1024);
-                if (flag != NULL)
-                    strcpy(buf[bufSize++], flag);
-            }
+            strcpy(buf[bufSize++], Commands[currCommand].flags[i]);
         }
 
-        if (strcmp(arguments, ""))
+        for (int i=0; i<Commands[currCommand].argumentsIndex; i++)
         {
-            char *argument;
-            argument = (char *)malloc(1024);
-            strcpy(temp, arguments);
-            argument = strtok(temp, " ");
             buf[bufSize] = (char *)malloc(1024);
-            strcpy(buf[bufSize++], argument);
-
-            while (argument != NULL)
-            {
-                argument = strtok(NULL, " ");
-                buf[bufSize] = (char *)malloc(1024);
-                if (argument != NULL)
-                    strcpy(buf[bufSize++], argument);
-            }
+            strcpy(buf[bufSize++], Commands[currCommand].arguments[i]);
         }
 
         buf[bufSize] = NULL;
-        if (execvp(command, buf) < 0)
+        if (execvp(buf[0], buf) < 0)
         {
             printf("*** ERROR: exec failed\n");
             exit(1);
@@ -101,9 +77,9 @@ int execInput()
     else if (pid > 0)
     {
         pidStack[pidTop] = pid;
-        strcpy(processStack[pidTop++], command);
+        strcpy(processStack[pidTop++], Commands[currCommand].command);
 
-        if (backgroundFlag)
+        if (Commands[currCommand].backgroundFlag)
             printf("[%d] %d\n", count++, pid);
         else
             waitpid(pid, &status, 0);

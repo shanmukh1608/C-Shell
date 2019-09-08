@@ -108,6 +108,7 @@ void commandLoop()
 
         while (currInput != NULL)
         {
+            // printf("Currinput=%s\n", currInput);
             parseInput(currInput);
             writeToHistory(inputCopy); //copy because input has been tokenized
 
@@ -127,8 +128,8 @@ void commandLoop()
                 nightswatch();
             else if (!strcmp(Commands[currCommand].command, "exit"))
                 exit(0);
-            // else
-                // execInput();
+            else
+                execInput();
 
             currInput = strtok(NULL, ";");
         }

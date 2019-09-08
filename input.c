@@ -20,12 +20,11 @@ void parseInput()
     Commands[currCommand].flagsIndex = 0;
     Commands[currCommand].argumentsIndex = 0;
     Commands[currCommand].backgroundFlag = 0;
-    
-
 
     int i = 0, j = 0;
 
     Commands[currCommand].command = (char *)malloc(1024);
+    strcpy(Commands[currCommand].command, "");
 
     while (i < strlen(currInput) && currInput[i] == ' ')
         i++;
@@ -131,4 +130,11 @@ void parseInput()
         Commands[currCommand].outputFile = (char *)malloc(1024);
         strcpy(Commands[currCommand].outputFile, cToStr);
     }
+
+    // printf("Command=%s\nInput File=%s\nOutput file=%s\n", Commands[currCommand].command, Commands[currCommand].inputFile, Commands[currCommand].outputFile);
+    // for (int i=0; i<Commands[currCommand].flagsIndex; i++)
+    //     printf("%s\n", Commands[currCommand].flags[i]);
+    // for (int i=0; i<Commands[currCommand].argumentsIndex; i++)
+    //     printf("%s\n", Commands[currCommand].arguments[i]);
+    // printf("///////////////// \n");
 }
