@@ -48,21 +48,13 @@ void nonblock(int state)
 
 void nightswatch()
 {
-    char timestr[10];
-    int i = 0;
-
-    while (!isDigit(flags[i]))
-        i++;
-    while (i < strlen(flags))
+    if (Commands[currCommand].flagsIndex < 2 || Commands[currCommand].argumentsIndex == 0)
     {
-        char cToStr[2];
-        cToStr[1] = '\0';
-        cToStr[0] = flags[i];
-        strcat(timestr, cToStr);
-        i++;
+        printf("Error, not enough arguments\n");
+        return;
     }
 
-    int time = atoi(timestr);
+    int time = atoi(Commands[currCommand].flags[1]);
 
     fd_set input_set;
     struct timeval timeout;
@@ -72,7 +64,7 @@ void nightswatch()
     /* Listen to the input descriptor */
     FD_SET(STDIN_FILENO, &input_set);
 
-    if (!strcmp(arguments, "interrupt"))
+    if (!strcmp(Commands[currCommand].arguments[0], "interrupt"))
     {
         // Interupt
         printf("0\tCPU0\tCPU1\tCPU2\tCPU3\tCPU4\tCPU5\tCPU6\tCPU7\n");
@@ -125,7 +117,7 @@ void nightswatch()
         return;
     }
 
-    if (!strcmp(arguments, "dirty"))
+    if (!strcmp(Commands[currCommand].arguments[0], "dirty"))
     {
         // dirty
         int status = 0;

@@ -33,17 +33,16 @@ void history()
         chr = getc(fp);
     }
 
-    fclose(fp);
-    fp = fopen(historyFile, "r");
+    fseek(fp, 0, SEEK_SET);
 
     char line[1024];
     int n;
 
     //to calculate n
-    if (!strcmp(arguments, ""))
+    if (Commands[currCommand].argumentsIndex == 0)
         n = 10;
     else
-        n = atoi(arguments);
+        n = atoi(Commands[currCommand].arguments[0]);
 
     //to print history
     if (numHist > n)

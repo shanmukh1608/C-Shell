@@ -16,27 +16,34 @@
 
 void cd()
 {
-    if (!strcmp(arguments, "") || !strcmp(arguments, "~"))
-        strcpy(arguments, shellHome);
+    // if (!strcmp(Commands[currCommand].arguments[0], "") || !strcmp(Commands[currCommand].arguments[0], "~"))
+    // strcpy(Commands[currCommand].arguments[0], shellHome);
 
-    if (arguments[0] == '~')
+    if (Commands[currCommand].argumentsIndex == 0 || (Commands[currCommand].argumentsIndex > 0 && !strcmp(Commands[currCommand].arguments[0], "~")))
     {
-        for (int i = 0; i < strlen(arguments) - 1; i++)
-            arguments[i] = arguments[i + 1];
-        arguments[strlen(arguments) - 1] = '\0';
+        Commands[currCommand].arguments[0] = (char *)malloc(1024);
+        strcpy(Commands[currCommand].arguments[0], shellHome);
+    }
+
+    if (Commands[currCommand].arguments[0][0] == '~')
+    {
+        for (int i = 0; i < strlen(Commands[currCommand].arguments[0]) - 1; i++)
+            Commands[currCommand].arguments[0][i] = Commands[currCommand].arguments[0][i + 1];
+
+        Commands[currCommand].arguments[0][strlen(Commands[currCommand].arguments[0]) - 1] = '\0';
 
         char temp[1024];
         strcpy(temp, shellHome);
-        strcat(temp, arguments);
-        strcpy(arguments, temp);
+        strcat(temp, Commands[currCommand].arguments[0]);
+        strcpy(Commands[currCommand].arguments[0], temp);
     }
 
-    DIR *dir = opendir(arguments);
+    DIR *dir = opendir(Commands[currCommand].arguments[0]);
 
     if (dir)
     {
         /* Directory exists. */
-        chdir(arguments);
+        chdir(Commands[currCommand].arguments[0]);
     }
     else if (ENOENT == errno)
     {

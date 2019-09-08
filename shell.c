@@ -32,7 +32,10 @@ int pidStack[1024];
 char processStack[1024][1024];
 char *shellPrompt;
 char *input;
-char *currCommand;
+char *currInput;
+int currCommand;
+struct commandStruct Commands[1024];
+
 
 void prompt()
 {
@@ -101,33 +104,33 @@ void commandLoop()
 
         char inputCopy[1024];
         strcpy(inputCopy,input);
-        currCommand = strtok(input, ";");
+        currInput = strtok(input, ";");
 
-        while (currCommand != NULL)
+        while (currInput != NULL)
         {
-            parseInput(currCommand);
+            parseInput(currInput);
             writeToHistory(inputCopy); //copy because input has been tokenized
 
-            if (!strcmp(command, "cd"))
+            if (!strcmp(Commands[currCommand].command, "cd"))
                 cd();
-            else if (!strcmp(command, "echo"))
+            else if (!strcmp(Commands[currCommand].command, "echo"))
                 echo();
-            else if (!strcmp(command, "pwd"))
+            else if (!strcmp(Commands[currCommand].command, "pwd"))
                 pwd();
-            else if (!strcmp(command, "pinfo"))
+            else if (!strcmp(Commands[currCommand].command, "pinfo"))
                 pinfo();
-            else if (!strcmp(command, "ls"))
+            else if (!strcmp(Commands[currCommand].command, "ls"))
                 ls();
-            else if (!strcmp(command, "history"))
+            else if (!strcmp(Commands[currCommand].command,  "history"))
                 history();
-            else if (!strcmp(command, "nightswatch"))
+            else if (!strcmp(Commands[currCommand].command, "nightswatch"))
                 nightswatch();
-            else if (!strcmp(command, "exit"))
+            else if (!strcmp(Commands[currCommand].command, "exit"))
                 exit(0);
-            else
-                execInput();
+            // else
+                // execInput();
 
-            currCommand = strtok(NULL, ";");
+            currInput = strtok(NULL, ";");
         }
     }
 }

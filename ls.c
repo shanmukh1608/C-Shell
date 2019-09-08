@@ -51,10 +51,10 @@ void full_ls(int a)
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
 
-    DIR *curdir1 = opendir(arguments);
+    DIR *curdir1 = opendir(Commands[currCommand].arguments[0]);
     struct dirent *curfile1;
     int max = 0; //store digits of maximum size
-    chdir(arguments);
+    chdir(Commands[currCommand].arguments[0]);
     while ((curfile1 = readdir(curdir1)) != NULL)
     {
         struct stat fileStat1;
@@ -66,8 +66,8 @@ void full_ls(int a)
     chdir(cwd);
 
     struct dirent *curfile;
-    DIR *curdir = opendir(arguments);
-    chdir(arguments);
+    DIR *curdir = opendir(Commands[currCommand].arguments[0]);
+    chdir(Commands[currCommand].arguments[0]);
     while ((curfile = readdir(curdir)) != NULL)
     {
         if ((isHiddenFile(curfile->d_name)) && (!a))
@@ -79,7 +79,7 @@ void full_ls(int a)
 
 void regular_ls(int a)
 {
-    DIR *curdir = opendir(arguments);
+    DIR *curdir = opendir(Commands[currCommand].arguments[0]);
     struct dirent *curfile;
     while ((curfile = readdir(curdir)) != NULL)
     {
@@ -92,40 +92,46 @@ void regular_ls(int a)
 
 void ls()
 {
-    if (!strcmp(arguments, ""))
+    if (Commands[currCommand].argumentsIndex == 0)
     {
         char cur[1024];
         if (getcwd(cur, sizeof(cur)) == NULL)
             perror("getcwd() error");
-        strcpy(arguments, cur);
+        Commands[currCommand].arguments[0] = (char *)malloc(1024);
+        strcpy(Commands[currCommand].arguments[0], cur);
     }
 
-    else if (!strcmp(arguments, "~"))
-        strcpy(arguments, shellHome);
+    else if (!strcmp(Commands[currCommand].arguments[0], "~"))
+        strcpy(Commands[currCommand].arguments[0], shellHome);
 
-    else if (arguments[0] == '~')
+    else if (Commands[currCommand].arguments[0][0] == '~')
     {
-        for (int i = 0; i < strlen(arguments) - 1; i++)
-            arguments[i] = arguments[i + 1];
-        arguments[strlen(arguments) - 1] = '\0';
+        for (int i = 0; i < strlen(Commands[currCommand].arguments[0]) - 1; i++)
+            Commands[currCommand].arguments[0][i] = Commands[currCommand].arguments[0][i + 1];
+        Commands[currCommand].arguments[0][strlen(Commands[currCommand].arguments[0]) - 1] = '\0';
 
         char temp[1024];
         strcpy(temp, shellHome);
-        strcat(temp, arguments);
-        strcpy(arguments, temp);
+        strcat(temp, Commands[currCommand].arguments[0]);
+        strcpy(Commands[currCommand].arguments[0], temp);
     }
 
     int l = 0, a = 0;
-
-    if (!strcmp(flags, "-la") || !strcmp(flags, "-al") || !strcmp(flags, "-l -a") || !strcmp(flags, "-a -l"))
-        l = 1, a = 1;
-    else if (!strcmp(flags, "-l"))
-        l = 1;
-    else if (!strcmp(flags, "-a"))
-        a = 1;
+    if (Commands[currCommand].flagsIndex == 1)
+    {
+        if (!strcmp(Commands[currCommand].flags[0], "-la") || !strcmp(Commands[currCommand].flags[0], "-al")) 
+            l = 1, a = 1;
+        else if (!strcmp(Commands[currCommand].flags[0], "-l"))
+            l = 1;
+        else if (!strcmp(Commands[currCommand].flags[0], "-a"))
+            a = 1;
+    }
+    else if (Commands[currCommand].flagsIndex == 2)
+        if ((!strcmp(Commands[currCommand].flags[0], "-l") && !strcmp(Commands[currCommand].flags[1], "-a")) || (!strcmp(Commands[currCommand].flags[0], "-a") && !strcmp(Commands[currCommand].flags[1], "-l")))
+            l=1, a=1;
 
     struct stat path_stat;
-    stat(arguments, &path_stat);
+    stat(Commands[currCommand].arguments[0], &path_stat);
 
     if (S_ISDIR(path_stat.st_mode)) //if ls is run on directory
     {
@@ -134,11 +140,11 @@ void ls()
         else
             regular_ls(a);
     }
-    else if (isFile(arguments))
+    else if (isFile(Commands[currCommand].arguments[0]))
         if (l)
-            full_ls_file(arguments, a, 10);
+            full_ls_file(Commands[currCommand].arguments[0], a, 10);
         else
-            printf("%s\n", arguments);
+            printf("%s\n", Commands[currCommand].arguments[0]);
     else
         perror("");
 }

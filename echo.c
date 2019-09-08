@@ -16,5 +16,8 @@
 
 void echo()
 {
-    printf("%s\n", arguments);
+    for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
+        printf("%s ", Commands[currCommand].arguments[i]);
+
+    printf("\n");
 }

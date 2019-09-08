@@ -12,79 +12,123 @@
 #include <dirent.h>
 #include "globals.h"
 
-int backgroundFlag;
-char *input;
-char *command;
-char *flags;
-char *arguments;
-char *currCommand;
+char *currInput;
 
 void parseInput()
 {
+    currCommand = 0;
+    Commands[currCommand].flagsIndex = 0;
+    Commands[currCommand].argumentsIndex = 0;
+    Commands[currCommand].backgroundFlag = 0;
+    
+
+
     int i = 0, j = 0;
 
-    command = (char *)malloc(1024 * sizeof(char));
-    flags = (char *)malloc(1024 * sizeof(char));
-    arguments = (char *)malloc(1024 * sizeof(char));
+    Commands[currCommand].command = (char *)malloc(1024);
 
-    while (i < strlen(currCommand) && currCommand[i] == ' ')
+    while (i < strlen(currInput) && currInput[i] == ' ')
         i++;
 
-    while (i < strlen(currCommand) && currCommand[i] != ' ')
+    while (i < strlen(currInput) && currInput[i] != ' ')
     {
         char cToStr[2];
         cToStr[1] = '\0';
-        cToStr[0] = currCommand[i];
-        strcat(command, cToStr);
+        cToStr[0] = currInput[i];
+        strcat(Commands[currCommand].command, cToStr);
         i++;
     }
 
-    while (i < strlen(currCommand) && currCommand[i] == ' ')
+    while (i < strlen(currInput) && currInput[i] == ' ')
         i++;
 
-    int curr = i;
-    while (i < strlen(currCommand))
+    int flagStart = i;
+
+    while (i < strlen(currInput))
     {
-        if (i == curr)
-            if (isDigit(currCommand[i]))
+        if (i == flagStart)
+            if (isDigit(currInput[i]))
                 break;
 
-        if (currCommand[i] == '-' || isDigit(currCommand[i]))
+        if (currInput[i] == '-' || isDigit(currInput[i]))
         {
             char cToStr[1024];
             j = 0;
 
-            while (i < strlen(currCommand) && currCommand[i] != ' ')
-                cToStr[j++] = currCommand[i++];
+            while (i < strlen(currInput) && currInput[i] != ' ')
+                cToStr[j++] = currInput[i++];
 
-            cToStr[j] = ' ';
-            cToStr[j + 1] = '\0';
-            strcat(flags, cToStr);
+            cToStr[j] = '\0';
+            Commands[currCommand].flags[Commands[currCommand].flagsIndex] = (char *)malloc(1024);
+            strcpy(Commands[currCommand].flags[Commands[currCommand].flagsIndex++], cToStr);
         }
 
-        else if (currCommand[i] == ' ')
+        else if (currInput[i] == ' ')
             i++;
 
         else
             break;
     }
 
-    flags[strlen(flags) - 1] = '\0';
-    backgroundFlag = 0;
-
-    int end;
-    for (end = strlen(currCommand) - 1; end >= i && (currCommand[end] == ' ' || currCommand[end] == '&'); end--)
-        if (currCommand[end] == '&')
-            backgroundFlag = 1;
-
-    while (i <= end)
+    while (i < strlen(currInput) && currInput[i] != '<' && currInput[i] != '>')
     {
-        char cToStr[2];
-        cToStr[1] = '\0';
-        cToStr[0] = currCommand[i];
-        strcat(arguments, cToStr);
-        i++;
+        if (currInput[i] != ' ')
+        {
+            char cToStr[1024];
+            j = 0;
+            while (i <= strlen(currInput) && currInput[i] != ' ' && currInput[i] != '<' && currInput[i] != '>')
+                cToStr[j++] = currInput[i++];
+
+            cToStr[j] = '\0';
+            Commands[currCommand].arguments[Commands[currCommand].argumentsIndex] = (char *)malloc(1024);
+            strcpy(Commands[currCommand].arguments[Commands[currCommand].argumentsIndex++], cToStr);
+        }
+
+        else
+            i++;
     }
 
-    // printf("%s\n%s\n%s\n%d\n", command, flags, arguments, backgroundFlag);
+    if (Commands[currCommand].argumentsIndex > 0 && !strcmp(Commands[currCommand].arguments[Commands[currCommand].argumentsIndex - 1], "&"))
+    {
+        Commands[currCommand].backgroundFlag = 1;
+        Commands[currCommand].argumentsIndex--;
+    }
+
+    while (i != strlen(currInput) && currInput[i] == ' ')
+        i++;
+
+    if (i != strlen(currInput) && currInput[i] == '<')
+    {
+        i++;
+        while (i != strlen(currInput) && currInput[i] == ' ')
+            i++;
+
+        char cToStr[1024];
+        j = 0;
+        while (i != strlen(currInput) && currInput[i] != ' ' && currInput[i] != '>')
+            cToStr[j++] = currInput[i++];
+
+        cToStr[j] = '\0';
+        Commands[currCommand].inputFile = (char *)malloc(1024);
+        strcpy(Commands[currCommand].inputFile, cToStr);
+    }
+
+    while (i != strlen(currInput) && currInput[i] == ' ')
+        i++;
+
+    if (i != strlen(currInput) && currInput[i] == '>')
+    {
+        i++;
+        while (i != strlen(currInput) && currInput[i] == ' ')
+            i++;
+
+        char cToStr[1024];
+        j = 0;
+        while (i != strlen(currInput) && currInput[i] != ' ' && currInput[i] != '>')
+            cToStr[j++] = currInput[i++];
+
+        cToStr[j] = '\0';
+        Commands[currCommand].outputFile = (char *)malloc(1024);
+        strcpy(Commands[currCommand].outputFile, cToStr);
+    }
 }

@@ -18,11 +18,15 @@ void proc_info()
 {
     char *filelink;
     filelink = (char *)malloc(1024);
-    strcat(filelink, "/proc/");
+    strcpy(filelink, "/proc/");
     char pid_string[1024];
 
-    if (strcmp(arguments, ""))
-        strcat(filelink, arguments);
+    if (Commands[currCommand].argumentsIndex == 0)
+    {
+        Commands[currCommand].arguments[0] = (char *)malloc(1024);
+        strcat(filelink, Commands[currCommand].arguments[0]);
+    }
+
     else
     {
         char pid_string[1024];
@@ -30,8 +34,11 @@ void proc_info()
         strcat(filelink, pid_string);
     }
 
-    strcat(filelink, "/stat");
+    strcat(filelink, "stat");
     FILE *file = fopen(filelink, "r");
+    printf("%s\n", filelink);
+    if (file == NULL)
+        printf("omg rip\n");
     char line[1024];
 
     fgets(line, 1024, file);
@@ -72,7 +79,7 @@ void proc_info()
 
 void pinfo()
 {
-    if (!strcmp(arguments, ""))
+    if (Commands[currCommand].argumentsIndex == 0)
         printf("pid -- %d\n", mainPID);
 
     else
@@ -80,14 +87,14 @@ void pinfo()
         char *filelink;
         filelink = (char *)malloc(1024);
         strcat(filelink, "/proc/");
-        strcat(filelink, arguments);
+        strcat(filelink, Commands[currCommand].arguments[0]);
         struct stat sts;
         if (stat(filelink, &sts) == -1 && errno == ENOENT)
         {
             printf("There's no process with given pid\n");
             return;
         }
-        printf("pid -- %s\n", arguments);
+        printf("pid -- %s\n", Commands[currCommand].arguments[0]);
     }
     proc_info();
     printf("Process Status -- %c\n", state);
@@ -97,14 +104,14 @@ void pinfo()
     link = (char *)malloc(1024);
     strcpy(link, "/proc/");
 
-    if (!strcmp(arguments, ""))
+    if (Commands[currCommand].argumentsIndex == 0)
     {
         char pid_string[1024];
         itoa(mainPID, pid_string, 10);
         strcat(link, pid_string);
     }
     else
-        strcat(link, arguments);
+        strcat(link, Commands[currCommand].arguments[0]);
 
     strcat(link, "/exe");
     int i;

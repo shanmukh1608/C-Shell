@@ -4,13 +4,18 @@
 extern char *input;
 extern char *command;
 extern char *flags;
-extern int backgroundFlag;
-extern char *arguments;
+struct commandStruct
+{
+    char *command, *flags[1024], *arguments[1024], *outputFile, *inputFile;
+    int flagsIndex, argumentsIndex, outputFd, inputFd, backgroundFlag;
+} Commands[1024];
+
 extern char shellHome[1024];
 extern char mon[4];
 extern char shellPWD[1024];
 extern char *shellPrompt;
-extern char *currCommand;
+extern char *currInput;
+extern int currCommand;
 extern int mainPID;
 extern int pidStack[1024];
 extern int pidTop;
