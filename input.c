@@ -134,12 +134,12 @@ int parseInput()
         cToStr[j] = '\0';
         Commands[currCommand].outputFile = (char *)malloc(1024);
         strcpy(Commands[currCommand].outputFile, cToStr);
-        Commands[currCommand].outputFd = open(Commands[currCommand].outputFile, O_WRONLY | O_CREAT, 00644);
+        Commands[currCommand].outputFd = open(Commands[currCommand].outputFile, O_TRUNC | O_WRONLY | O_CREAT, 00644);
     }
 
     else if (i != strlen(currInput) && currInput[i] == '>' && currInput[i + 1] == '>')
     {
-        i++;
+        i += 2;
         while (i != strlen(currInput) && currInput[i] == ' ')
             i++;
 
@@ -154,11 +154,11 @@ int parseInput()
         Commands[currCommand].outputFd = open(Commands[currCommand].outputFile, O_WRONLY | O_APPEND | O_CREAT, 00644);
     }
 
-    return 1;
     // printf("Command=%s\nInput File=%s\nOutput file=%s\n", Commands[currCommand].command, Commands[currCommand].inputFile, Commands[currCommand].outputFile);
     // for (int i=0; i<Commands[currCommand].flagsIndex; i++)
     //     printf("%s\n", Commands[currCommand].flags[i]);
     // for (int i=0; i<Commands[currCommand].argumentsIndex; i++)
     //     printf("%s\n", Commands[currCommand].arguments[i]);
     // printf("///////////////// \n");
+    return 1;
 }

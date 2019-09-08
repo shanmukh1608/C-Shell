@@ -17,7 +17,7 @@ void pwd()
 {
     char currDir[1024];
 
-    if (Commands[currCommand].argumentsIndex>0)
+    if (Commands[currCommand].argumentsIndex > 0)
     {
         dprintf(Commands[currCommand].outputFd, "pwd: Too many arguments\n");
         return;

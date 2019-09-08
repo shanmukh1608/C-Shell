@@ -53,19 +53,21 @@ int execInput()
         char *temp;
         temp = (char *)malloc(1024);
 
-        for (int i=0; i<Commands[currCommand].flagsIndex; i++)
+        for (int i = 0; i < Commands[currCommand].flagsIndex; i++)
         {
             buf[bufSize] = (char *)malloc(1024);
             strcpy(buf[bufSize++], Commands[currCommand].flags[i]);
         }
 
-        for (int i=0; i<Commands[currCommand].argumentsIndex; i++)
+        for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
         {
             buf[bufSize] = (char *)malloc(1024);
             strcpy(buf[bufSize++], Commands[currCommand].arguments[i]);
         }
 
+        dup2(Commands[currCommand].inputFd, 0);
         buf[bufSize] = NULL;
+        dup2(Commands[currCommand].outputFd, 1);
         if (execvp(buf[0], buf) < 0)
         {
             printf("*** ERROR: exec failed\n");

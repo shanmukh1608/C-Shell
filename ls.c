@@ -119,7 +119,7 @@ void ls()
     int l = 0, a = 0;
     if (Commands[currCommand].flagsIndex == 1)
     {
-        if (!strcmp(Commands[currCommand].flags[0], "-la") || !strcmp(Commands[currCommand].flags[0], "-al")) 
+        if (!strcmp(Commands[currCommand].flags[0], "-la") || !strcmp(Commands[currCommand].flags[0], "-al"))
             l = 1, a = 1;
         else if (!strcmp(Commands[currCommand].flags[0], "-l"))
             l = 1;
@@ -128,7 +128,7 @@ void ls()
     }
     else if (Commands[currCommand].flagsIndex == 2)
         if ((!strcmp(Commands[currCommand].flags[0], "-l") && !strcmp(Commands[currCommand].flags[1], "-a")) || (!strcmp(Commands[currCommand].flags[0], "-a") && !strcmp(Commands[currCommand].flags[1], "-l")))
-            l=1, a=1;
+            l = 1, a = 1;
 
     struct stat path_stat;
     stat(Commands[currCommand].arguments[0], &path_stat);

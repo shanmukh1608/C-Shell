@@ -36,7 +36,6 @@ char *currInput;
 int currCommand;
 struct commandStruct Commands[1024];
 
-
 void prompt()
 {
     shellPrompt = (char *)malloc(1024);
@@ -86,9 +85,10 @@ void commandLoop()
         int status;
         prompt();
         // printf("%s", shellPrompt);
-        printf ("\033[0;1;34m%s\033[0m", shellPrompt);
+        printf("\033[0;1;34m%s\033[0m", shellPrompt);
 
         input = (char *)malloc(1024 * sizeof(char));
+        strcpy(input, "");
         while (1)
         {
             char ch;
@@ -103,7 +103,7 @@ void commandLoop()
         }
 
         char inputCopy[1024];
-        strcpy(inputCopy,input);
+        strcpy(inputCopy, input);
         currInput = strtok(input, ";");
 
         while (currInput != NULL)
@@ -111,15 +111,15 @@ void commandLoop()
             // printf("Currinput=%s\n", currInput);
             if (!parseInput(currInput))
             {
-               writeToHistory(inputCopy); //copy because input has been tokenized
-               printf("%s doesn't exist\n", Commands[currCommand].inputFile);
-                currInput = strtok(NULL, ";");               
-               continue;
-            }
-            
-            if (!strcmp(currInput,""))
+                writeToHistory(inputCopy); //copy because input has been tokenized
+                printf("%s doesn't exist\n", Commands[currCommand].inputFile);
+                currInput = strtok(NULL, ";");
                 continue;
-                
+            }
+
+            if (!strcmp(currInput, ""))
+                continue;
+
             writeToHistory(inputCopy); //copy because input has been tokenized
 
             if (!strcmp(Commands[currCommand].command, "cd"))
@@ -132,7 +132,7 @@ void commandLoop()
                 pinfo();
             else if (!strcmp(Commands[currCommand].command, "ls"))
                 ls();
-            else if (!strcmp(Commands[currCommand].command,  "history"))
+            else if (!strcmp(Commands[currCommand].command, "history"))
                 history();
             else if (!strcmp(Commands[currCommand].command, "nightswatch"))
                 nightswatch();
