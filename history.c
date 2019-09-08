@@ -53,7 +53,7 @@ void history()
     }
 
     while (fgets(line, sizeof(line), fp))
-        printf("%s", line);
+        dprintf(Commands[currCommand].outputFd, "%s", line);
 
     fclose(fp);
 }

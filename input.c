@@ -14,12 +14,14 @@
 
 char *currInput;
 
-void parseInput()
+int parseInput()
 {
     currCommand = 0;
     Commands[currCommand].flagsIndex = 0;
     Commands[currCommand].argumentsIndex = 0;
     Commands[currCommand].backgroundFlag = 0;
+    Commands[currCommand].inputFd = 0;
+    Commands[currCommand].outputFd = 1;
 
     int i = 0, j = 0;
 
@@ -110,12 +112,15 @@ void parseInput()
         cToStr[j] = '\0';
         Commands[currCommand].inputFile = (char *)malloc(1024);
         strcpy(Commands[currCommand].inputFile, cToStr);
+        Commands[currCommand].inputFd = open(Commands[currCommand].inputFile, O_RDONLY);
+        if (Commands[currCommand].inputFd < 0)
+            return 0;
     }
 
     while (i != strlen(currInput) && currInput[i] == ' ')
         i++;
 
-    if (i != strlen(currInput) && currInput[i] == '>')
+    if (i != strlen(currInput) && currInput[i] == '>' && currInput[i + 1] != '>')
     {
         i++;
         while (i != strlen(currInput) && currInput[i] == ' ')
@@ -129,8 +134,27 @@ void parseInput()
         cToStr[j] = '\0';
         Commands[currCommand].outputFile = (char *)malloc(1024);
         strcpy(Commands[currCommand].outputFile, cToStr);
+        Commands[currCommand].outputFd = open(Commands[currCommand].outputFile, O_WRONLY | O_CREAT, 00644);
     }
 
+    else if (i != strlen(currInput) && currInput[i] == '>' && currInput[i + 1] == '>')
+    {
+        i++;
+        while (i != strlen(currInput) && currInput[i] == ' ')
+            i++;
+
+        char cToStr[1024];
+        j = 0;
+        while (i != strlen(currInput) && currInput[i] != ' ' && currInput[i] != '>')
+            cToStr[j++] = currInput[i++];
+
+        cToStr[j] = '\0';
+        Commands[currCommand].outputFile = (char *)malloc(1024);
+        strcpy(Commands[currCommand].outputFile, cToStr);
+        Commands[currCommand].outputFd = open(Commands[currCommand].outputFile, O_WRONLY | O_APPEND | O_CREAT, 00644);
+    }
+
+    return 1;
     // printf("Command=%s\nInput File=%s\nOutput file=%s\n", Commands[currCommand].command, Commands[currCommand].inputFile, Commands[currCommand].outputFile);
     // for (int i=0; i<Commands[currCommand].flagsIndex; i++)
     //     printf("%s\n", Commands[currCommand].flags[i]);

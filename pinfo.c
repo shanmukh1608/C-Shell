@@ -36,9 +36,7 @@ void proc_info()
 
     strcat(filelink, "stat");
     FILE *file = fopen(filelink, "r");
-    printf("%s\n", filelink);
-    if (file == NULL)
-        printf("omg rip\n");
+    dprintf(Commands[currCommand].outputFd, "%s\n", filelink);
     char line[1024];
 
     fgets(line, 1024, file);
@@ -80,7 +78,7 @@ void proc_info()
 void pinfo()
 {
     if (Commands[currCommand].argumentsIndex == 0)
-        printf("pid -- %d\n", mainPID);
+        dprintf(Commands[currCommand].outputFd, "pid -- %d\n", mainPID);
 
     else
     {
@@ -91,15 +89,15 @@ void pinfo()
         struct stat sts;
         if (stat(filelink, &sts) == -1 && errno == ENOENT)
         {
-            printf("There's no process with given pid\n");
+            dprintf(Commands[currCommand].outputFd, "There's no process with given pid\n");
             return;
         }
-        printf("pid -- %s\n", Commands[currCommand].arguments[0]);
+        dprintf(Commands[currCommand].outputFd, "pid -- %s\n", Commands[currCommand].arguments[0]);
     }
     proc_info();
-    printf("Process Status -- %c\n", state);
-    printf("memory -- %d {Virtual Memory}\n", vm_result);
-    printf("Executable Path --");
+    dprintf(Commands[currCommand].outputFd, "Process Status -- %c\n", state);
+    dprintf(Commands[currCommand].outputFd, "memory -- %d {Virtual Memory}\n", vm_result);
+    dprintf(Commands[currCommand].outputFd, "Executable Path --");
     char *link;
     link = (char *)malloc(1024);
     strcpy(link, "/proc/");
@@ -120,5 +118,5 @@ void pinfo()
     for (i = 0; i < 1024; i++)
         buf[i] = '\0';
     readlink(link, buf, 1024);
-    printf("%s\n", buf);
+    dprintf(Commands[currCommand].outputFd, "%s\n", buf);
 }

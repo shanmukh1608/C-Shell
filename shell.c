@@ -109,7 +109,17 @@ void commandLoop()
         while (currInput != NULL)
         {
             // printf("Currinput=%s\n", currInput);
-            parseInput(currInput);
+            if (!parseInput(currInput))
+            {
+               writeToHistory(inputCopy); //copy because input has been tokenized
+               printf("%s doesn't exist\n", Commands[currCommand].inputFile);
+                currInput = strtok(NULL, ";");               
+               continue;
+            }
+            
+            if (!strcmp(currInput,""))
+                continue;
+                
             writeToHistory(inputCopy); //copy because input has been tokenized
 
             if (!strcmp(Commands[currCommand].command, "cd"))

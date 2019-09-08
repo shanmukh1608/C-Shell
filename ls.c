@@ -43,7 +43,7 @@ void full_ls_file(char *filename, int a, int max)
     *t = fileStat.st_mtime;
     struct tm tm = *localtime(t);
     Mon(tm.tm_mon + 1);
-    printf("%s %2ld %s %s %*ld %s %d %d:%02d %s\n", permissions, fileStat.st_nlink, pwd->pw_name, grp->gr_name, max, fileStat.st_size, mon, tm.tm_mday, tm.tm_hour, tm.tm_min, filename);
+    dprintf(Commands[currCommand].outputFd, "%s %2ld %s %s %*ld %s %d %d:%02d %s\n", permissions, fileStat.st_nlink, pwd->pw_name, grp->gr_name, max, fileStat.st_size, mon, tm.tm_mday, tm.tm_hour, tm.tm_min, filename);
 }
 
 void full_ls(int a)
@@ -85,9 +85,9 @@ void regular_ls(int a)
     {
         if ((isHiddenFile(curfile->d_name)) && (!a))
             continue;
-        printf("%s   ", curfile->d_name);
+        dprintf(Commands[currCommand].outputFd, "%s   ", curfile->d_name);
     }
-    printf("\n");
+    dprintf(Commands[currCommand].outputFd, "\n");
 }
 
 void ls()
@@ -144,7 +144,7 @@ void ls()
         if (l)
             full_ls_file(Commands[currCommand].arguments[0], a, 10);
         else
-            printf("%s\n", Commands[currCommand].arguments[0]);
+            dprintf(Commands[currCommand].outputFd, "%s\n", Commands[currCommand].arguments[0]);
     else
         perror("");
 }

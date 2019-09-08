@@ -19,12 +19,12 @@ void pwd()
 
     if (Commands[currCommand].argumentsIndex>0)
     {
-        printf("pwd: Too many arguments\n");
+        dprintf(Commands[currCommand].outputFd, "pwd: Too many arguments\n");
         return;
     }
 
     if (getcwd(currDir, sizeof(currDir)) != NULL)
-        printf("%s\n", currDir);
+        dprintf(Commands[currCommand].outputFd, "%s\n", currDir);
     else
         perror("getcwd() error");
 }

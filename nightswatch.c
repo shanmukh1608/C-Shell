@@ -50,7 +50,7 @@ void nightswatch()
 {
     if (Commands[currCommand].flagsIndex < 2 || Commands[currCommand].argumentsIndex == 0)
     {
-        printf("Error, not enough arguments\n");
+        dprintf(Commands[currCommand].outputFd, "Error, not enough arguments\n");
         return;
     }
 
@@ -67,7 +67,7 @@ void nightswatch()
     if (!strcmp(Commands[currCommand].arguments[0], "interrupt"))
     {
         // Interupt
-        printf("0\tCPU0\tCPU1\tCPU2\tCPU3\tCPU4\tCPU5\tCPU6\tCPU7\n");
+        dprintf(Commands[currCommand].outputFd, "0\tCPU0\tCPU1\tCPU2\tCPU3\tCPU4\tCPU5\tCPU6\tCPU7\n");
         int k = 1, status = 0;
 
         nonblock(1);
@@ -141,7 +141,7 @@ void nightswatch()
             while (i < 17 && (reads = getline(&line, &len, meminfo)) != -1)
                 i++;
 
-            printf("%s", line);
+            dprintf(Commands[currCommand].outputFd, "%s", line);
 
             fclose(meminfo);
 
