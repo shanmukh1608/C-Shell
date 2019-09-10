@@ -13,15 +13,22 @@
 #include "globals.h"
 
 char *currInput;
+char pipeSeparated[1024][1024];
+int pipeIndex;
+int pipes[1024];
 
 int parseInput()
 {
-    currCommand = 0;
     Commands[currCommand].flagsIndex = 0;
     Commands[currCommand].argumentsIndex = 0;
     Commands[currCommand].backgroundFlag = 0;
+    Commands[currCommand].errorFlag = 0;
     Commands[currCommand].inputFd = 0;
     Commands[currCommand].outputFd = 1;
+    Commands[currCommand].inputFile = (char *)malloc(1024);
+    strcpy(Commands[currCommand].inputFile, "");
+    Commands[currCommand].outputFile = (char *)malloc(1024);
+    strcpy(Commands[currCommand].outputFile, "");
 
     int i = 0, j = 0;
 
@@ -155,10 +162,45 @@ int parseInput()
     }
 
     // printf("Command=%s\nInput File=%s\nOutput file=%s\n", Commands[currCommand].command, Commands[currCommand].inputFile, Commands[currCommand].outputFile);
-    // for (int i=0; i<Commands[currCommand].flagsIndex; i++)
+    // for (int i = 0; i < Commands[currCommand].flagsIndex; i++)
     //     printf("%s\n", Commands[currCommand].flags[i]);
-    // for (int i=0; i<Commands[currCommand].argumentsIndex; i++)
+    // for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
     //     printf("%s\n", Commands[currCommand].arguments[i]);
-    // printf("///////////////// \n");
+    // printf("NEXT\n");
     return 1;
+}
+
+void separatePipes()
+{
+    int i = 0;
+    while (i < strlen(sepInput))
+    {
+        if (sepInput[i] == '|')
+        {
+            pipeIndex++;
+            strcpy(pipeSeparated[pipeIndex], "");
+            i++;
+            continue;
+        }
+        char cToStr[2];
+        cToStr[1] = '\0';
+        cToStr[0] = sepInput[i];
+        strcat(pipeSeparated[pipeIndex], cToStr);
+
+        i++;
+    }
+}
+
+void createPipes()
+{
+    for (int i = 1; i <= pipeIndex; i++)
+    {
+        int fildes[2];
+        if (pipe(fildes) != 0)
+            perror("pipe failed");
+        pipes[i * 2] = fildes[0];
+        pipes[i * 2 + 1] = fildes[1];
+        // Commands[i-1].outputFd = fildes[1];
+        // Commands[i].inputFd = fildes[0];
+    }
 }

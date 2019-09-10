@@ -15,8 +15,23 @@
 #include "globals.h"
 #include "ls.h"
 
+int in, out;
+
+#define Close(FD)                                         \
+    do                                                    \
+    {                                                     \
+        int Close_fd = (FD);                              \
+        if (close(Close_fd) == -1)                        \
+        {                                                 \
+            perror("close");                              \
+            fprintf(stderr, "%s:%d: close(" #FD ") %d\n", \
+                    __FILE__, __LINE__, Close_fd);        \
+        }                                                 \
+    } while (0)
+
 int count = 1;
 char proc_stack[1024][1024];
+char *buf[1024];
 
 void procExit()
 {
@@ -36,60 +51,117 @@ void procExit()
     }
 }
 
-int execInput()
+// void run()
+// {
+//     dup2(in, STDIN_FILENO);   /* <&in  : child reads from in */
+//     dup2(out, STDOUT_FILENO); /* >&out : child writes to out */
+
+//     execvp(buf[0], buf);
+// }
+
+int createBuf()
 {
-    signal(SIGCHLD, procExit);
-    int status;
+    buf[0] = (char *)malloc(1024);
+    strcpy(buf[0], Commands[currCommand].command);
+
+    int bufSize = 1;
+
+    char *temp;
+    temp = (char *)malloc(1024);
+
+    for (int i = 0; i < Commands[currCommand].flagsIndex; i++)
+    {
+        buf[bufSize] = (char *)malloc(1024);
+        strcpy(buf[bufSize++], Commands[currCommand].flags[i]);
+    }
+
+    for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
+    {
+        buf[bufSize] = (char *)malloc(1024);
+        strcpy(buf[bufSize++], Commands[currCommand].arguments[i]);
+    }
+
+    buf[bufSize] = NULL;
+
+    return buf;
+}
+
+void execCommand()
+{
+    if (!strcmp(Commands[currCommand].command, "cd"))
+        cd();
+    else if (!strcmp(Commands[currCommand].command, "echo"))
+        echo();
+    else if (!strcmp(Commands[currCommand].command, "pwd"))
+        pwd();
+    else if (!strcmp(Commands[currCommand].command, "pinfo"))
+        pinfo();
+    else if (!strcmp(Commands[currCommand].command, "ls"))
+        ls();
+    else if (!strcmp(Commands[currCommand].command, "history"))
+        history();
+    else if (!strcmp(Commands[currCommand].command, "nightswatch"))
+        nightswatch();
+    else if (!strcmp(Commands[currCommand].command, "exit"))
+        exit(0);
+    else
+    {
+        int status;
+        signal(SIGCHLD, procExit);
+        pid_t pid = fork();
+        if (pid == 0)
+        {
+            createBuf();
+            if (currCommand == 0)
+                dup2(Commands[currCommand].inputFd, 0);
+            if (execvp(buf[0], buf) < 0)
+            {
+                printf("Error executing\n");
+                exit(1);
+            }
+        }
+
+        else if (pid > 0)
+        {
+            pidStack[pidTop] = pid;
+            strcpy(processStack[pidTop++], Commands[currCommand].command);
+
+            if (Commands[currCommand].backgroundFlag)
+                printf("[%d] %d\n", count++, pid);
+            else
+                waitpid(pid, &status, 0);
+        }
+
+        else
+            printf("fork error\n");
+
+        return status;
+    }
+}
+
+void execPipe()
+{
+    int fd[2];
+    pipe(fd);
+    // printf("%s\n", Commands[currCommand].command);
     pid_t pid = fork();
+
     if (pid == 0)
     {
-        // printf("%s\n%s\n%s\n", command, flags, arguments);
-        char *buf[1024];
-        buf[0] = (char *)malloc(1024);
-        strcpy(buf[0], Commands[currCommand].command);
-
-        int bufSize = 1;
-
-        char *temp;
-        temp = (char *)malloc(1024);
-
-        for (int i = 0; i < Commands[currCommand].flagsIndex; i++)
-        {
-            buf[bufSize] = (char *)malloc(1024);
-            strcpy(buf[bufSize++], Commands[currCommand].flags[i]);
-        }
-
-        for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
-        {
-            buf[bufSize] = (char *)malloc(1024);
-            strcpy(buf[bufSize++], Commands[currCommand].arguments[i]);
-        }
-
-        dup2(Commands[currCommand].inputFd, 0);
-        buf[bufSize] = NULL;
-        dup2(Commands[currCommand].outputFd, 1);
-        if (execvp(buf[0], buf) < 0)
-        {
-            printf("*** ERROR: exec failed\n");
-            exit(1);
-        }
-        exit(0);
+        dup2(fd[1], 1);
+        execCommand();
+        abort();
     }
 
     else if (pid > 0)
     {
-        pidStack[pidTop] = pid;
-        strcpy(processStack[pidTop++], Commands[currCommand].command);
-
-        if (Commands[currCommand].backgroundFlag)
-            printf("[%d] %d\n", count++, pid);
-        else
-            waitpid(pid, &status, 0);
+        dup2(fd[0], 0);
+        close(fd[1]);
     }
+
     else
-    {
         printf("fork error\n");
-    }
 
-    return status;
+    close(fd[0]);
+    close(fd[1]);
 }

@@ -32,8 +32,11 @@ int pidStack[1024];
 char processStack[1024][1024];
 char *shellPrompt;
 char *input;
-char *currInput;
+char *sepInput;
 int currCommand;
+int savestdin;
+int savestdout;
+
 struct commandStruct Commands[1024];
 
 void prompt()
@@ -80,6 +83,8 @@ void prompt()
 
 void commandLoop()
 {
+    savestdin = dup(0);
+    savestdout = dup(1);
     while (1)
     {
         int status;
@@ -104,44 +109,48 @@ void commandLoop()
 
         char inputCopy[1024];
         strcpy(inputCopy, input);
-        currInput = strtok(input, ";");
+        sepInput = strtok(input, ";");
 
-        while (currInput != NULL)
+        while (sepInput != NULL)
         {
-            // printf("Currinput=%s\n", currInput);
-            if (!parseInput(currInput))
-            {
-                writeToHistory(inputCopy); //copy because input has been tokenized
-                printf("%s doesn't exist\n", Commands[currCommand].inputFile);
-                currInput = strtok(NULL, ";");
-                continue;
-            }
-
-            if (!strcmp(currInput, ""))
-                continue;
-
             writeToHistory(inputCopy); //copy because input has been tokenized
 
-            if (!strcmp(Commands[currCommand].command, "cd"))
-                cd();
-            else if (!strcmp(Commands[currCommand].command, "echo"))
-                echo();
-            else if (!strcmp(Commands[currCommand].command, "pwd"))
-                pwd();
-            else if (!strcmp(Commands[currCommand].command, "pinfo"))
-                pinfo();
-            else if (!strcmp(Commands[currCommand].command, "ls"))
-                ls();
-            else if (!strcmp(Commands[currCommand].command, "history"))
-                history();
-            else if (!strcmp(Commands[currCommand].command, "nightswatch"))
-                nightswatch();
-            else if (!strcmp(Commands[currCommand].command, "exit"))
-                exit(0);
-            else
-                execInput();
+            if (!strcmp(sepInput, ""))
+                continue;
+            pipeIndex = 0;
+            strcpy(pipeSeparated[0], "");
+            separatePipes();
 
-            currInput = strtok(NULL, ";");
+            for (currCommand = 0; currCommand <= pipeIndex; currCommand++)
+            {
+                currInput = (char *)malloc(1024);
+                strcpy(currInput, pipeSeparated[currCommand]);
+                if (!parseInput())
+                    Commands[currCommand].errorFlag = 1;
+            }
+
+            for (currCommand = 0; currCommand <= pipeIndex; currCommand++)
+            {
+                if (pipeIndex == 0)
+                {
+                    dup2(Commands[currCommand].inputFd, STDIN_FILENO);
+                    dup2(Commands[currCommand].outputFd, STDOUT_FILENO);
+                    execCommand();
+                    dup2(savestdin, STDIN_FILENO);
+                    dup2(savestdout, STDOUT_FILENO);
+                }
+                else if (currCommand != pipeIndex)
+                    execPipe();
+                else
+                {
+                    dup2(Commands[currCommand].outputFd, 1);
+                    execCommand();
+                }
+            }
+
+            dup2(savestdin, STDIN_FILENO);
+            dup2(savestdout, STDOUT_FILENO);
+            sepInput = strtok(NULL, ";");
         }
     }
 }
