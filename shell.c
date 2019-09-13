@@ -89,7 +89,7 @@ void commandLoop()
     {
         int status;
         prompt();
-        // printf("%s", shellPrompt);
+
         printf("\033[0;1;34m%s\033[0m", shellPrompt);
 
         input = (char *)malloc(1024 * sizeof(char));
@@ -167,8 +167,7 @@ int main()
 
     mainPID = (int)getpid();
     strcpy(processStack[pidTop], "shell");
-    pidStack[pidTop] = mainPID;
-    pidTop++;
+    pidStack[pidTop++] = mainPID;
     commandLoop();
     return 0;
 }

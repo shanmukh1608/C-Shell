@@ -13,26 +13,28 @@
 #include <dirent.h>
 #include <signal.h>
 #include "globals.h"
-#include "ls.h"
 
-int count = 1;
-char proc_stack[1024][1024];
 char *buf[1024];
+int backgroundPidTop;
+int backgroundPidStack[1024];
+char backgroundProcessStack[1024][1024];
+int backgroundStatusStack[1024];
 
 void procExit()
 {
     int status;
 
-    for (int i = 1; i < pidTop; i++)
+    for (int i = 0; i < backgroundPidTop; i++)
     {
-        if (waitpid(pidStack[i], &status, WNOHANG) > 0)
+        if (waitpid(backgroundPidStack[i], &status, WNOHANG) > 0)
         {
+            backgroundStatusStack[i] = 1; //0=running, 1=stopped
             if (WIFEXITED(status) > 0)
-                printf("%s with pid %d exited normally\n", processStack[i], pidStack[i]);
+                printf("%s with pid %d exited normally\n", backgroundProcessStack[i], backgroundPidStack[i]);
             else if (WIFSIGNALED(status))
-                printf("%s with pid %d exited with signal\n", processStack[i], pidStack[i]);
+                printf("%s with pid %d exited with signal\n", backgroundProcessStack[i], backgroundPidStack[i]);
             else
-                printf("%s with pid %d exited abnormally\n", processStack[i], pidStack[i]);
+                printf("%s with pid %d exited abnormally\n", backgroundProcessStack[i], backgroundPidStack[i]);
         }
     }
 }
@@ -84,6 +86,8 @@ void execCommand()
         setEnv();
     else if (!strcmp(Commands[currCommand].command, "unsetenv"))
         unsetEnv();
+    else if (!strcmp(Commands[currCommand].command, "jobs"))
+        jobs();
     else if (!strcmp(Commands[currCommand].command, "exit"))
         exit(0);
     else
@@ -109,7 +113,25 @@ void execCommand()
             strcpy(processStack[pidTop++], Commands[currCommand].command);
 
             if (Commands[currCommand].backgroundFlag)
-                printf("[%d] %d\n", count++, pid);
+            {
+                backgroundPidStack[backgroundPidTop] = pid;
+                strcpy(backgroundProcessStack[backgroundPidTop], Commands[currCommand].command);
+
+                for (int t = 0; t < Commands[currCommand].flagsIndex; t++)
+                {
+                    strcat(backgroundProcessStack[backgroundPidTop], " ");
+                    strcat(backgroundProcessStack[backgroundPidTop], Commands[currCommand].flags[t]);
+                }
+
+                for (int t = 0; t < Commands[currCommand].argumentsIndex; t++)
+                {
+                    strcat(backgroundProcessStack[backgroundPidTop], " ");
+                    strcat(backgroundProcessStack[backgroundPidTop], Commands[currCommand].arguments[t]);
+                }
+
+                backgroundPidTop++;
+            }
+
             else
                 waitpid(pid, &status, 0);
         }
