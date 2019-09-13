@@ -15,20 +15,6 @@
 #include "globals.h"
 #include "ls.h"
 
-int in, out;
-
-#define Close(FD)                                         \
-    do                                                    \
-    {                                                     \
-        int Close_fd = (FD);                              \
-        if (close(Close_fd) == -1)                        \
-        {                                                 \
-            perror("close");                              \
-            fprintf(stderr, "%s:%d: close(" #FD ") %d\n", \
-                    __FILE__, __LINE__, Close_fd);        \
-        }                                                 \
-    } while (0)
-
 int count = 1;
 char proc_stack[1024][1024];
 char *buf[1024];
@@ -50,14 +36,6 @@ void procExit()
         }
     }
 }
-
-// void run()
-// {
-//     dup2(in, STDIN_FILENO);   /* <&in  : child reads from in */
-//     dup2(out, STDOUT_FILENO); /* >&out : child writes to out */
-
-//     execvp(buf[0], buf);
-// }
 
 int createBuf()
 {
@@ -102,6 +80,10 @@ void execCommand()
         history();
     else if (!strcmp(Commands[currCommand].command, "nightswatch"))
         nightswatch();
+    else if (!strcmp(Commands[currCommand].command, "setenv"))
+        setEnv();
+    else if (!strcmp(Commands[currCommand].command, "unsetenv"))
+        unsetEnv();
     else if (!strcmp(Commands[currCommand].command, "exit"))
         exit(0);
     else
