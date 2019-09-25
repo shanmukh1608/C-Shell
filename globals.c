@@ -14,6 +14,8 @@
 #include <time.h>
 #include "globals.h"
 
+int fgPid=0;
+
 int isNOTDIR(const char *name)
 {
 	DIR *directory = opendir(name);

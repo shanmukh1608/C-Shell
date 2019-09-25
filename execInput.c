@@ -13,31 +13,30 @@
 #include <dirent.h>
 #include <signal.h>
 #include "globals.h"
+#include "jobs.h"
+
 
 char *buf[1024];
-int backgroundPidTop;
-int backgroundPidStack[1024];
-char backgroundProcessStack[1024][1024];
-int backgroundStatusStack[1024];
 
 void procExit()
 {
     int status;
 
-    for (int i = 0; i < backgroundPidTop; i++)
+    for (int i = 0; i < pidTop; i++)
     {
-        if (waitpid(backgroundPidStack[i], &status, WNOHANG) > 0)
+        if (waitpid(pidStack[i], &status, WNOHANG) > 0)
         {
-            backgroundStatusStack[i] = 1; //0=running, 1=stopped
+            deleteJob(pidStack[i]);
             if (WIFEXITED(status) > 0)
-                printf("%s with pid %d exited normally\n", backgroundProcessStack[i], backgroundPidStack[i]);
+                printf("%s with pid %d exited normally\n", processStack[i], pidStack[i]);
             else if (WIFSIGNALED(status))
-                printf("%s with pid %d exited with signal\n", backgroundProcessStack[i], backgroundPidStack[i]);
+                printf("%s with pid %d exited with signal\n", processStack[i], pidStack[i]);
             else
-                printf("%s with pid %d exited abnormally\n", backgroundProcessStack[i], backgroundPidStack[i]);
+                printf("%s with pid %d exited abnormally\n", processStack[i], pidStack[i]);
         }
     }
 }
+
 
 int createBuf()
 {
@@ -90,7 +89,13 @@ void execCommand()
         jobs();
     else if (!strcmp(Commands[currCommand].command, "kjob"))
         kjob();
-    else if (!strcmp(Commands[currCommand].command, "exit"))
+    else if (!strcmp(Commands[currCommand].command, "overkill"))
+        overkill();
+    else if (!strcmp(Commands[currCommand].command, "fg"))
+        fg();
+    else if (!strcmp(Commands[currCommand].command, "bg"))
+        bg();
+    else if (!strcmp(Commands[currCommand].command, "quit"))
         exit(0);
     else
     {
@@ -99,6 +104,7 @@ void execCommand()
         pid_t pid = fork();
         if (pid == 0)
         {
+            setpgid(0, 0);
             createBuf();
             if (currCommand == 0)
                 dup2(Commands[currCommand].inputFd, 0);
@@ -114,28 +120,17 @@ void execCommand()
             pidStack[pidTop] = pid;
             strcpy(processStack[pidTop++], Commands[currCommand].command);
 
-            if (Commands[currCommand].backgroundFlag)
+            if (!Commands[currCommand].backgroundFlag)
             {
-                backgroundPidStack[backgroundPidTop] = pid;
-                strcpy(backgroundProcessStack[backgroundPidTop], Commands[currCommand].command);
-
-                for (int t = 0; t < Commands[currCommand].flagsIndex; t++)
-                {
-                    strcat(backgroundProcessStack[backgroundPidTop], " ");
-                    strcat(backgroundProcessStack[backgroundPidTop], Commands[currCommand].flags[t]);
-                }
-
-                for (int t = 0; t < Commands[currCommand].argumentsIndex; t++)
-                {
-                    strcat(backgroundProcessStack[backgroundPidTop], " ");
-                    strcat(backgroundProcessStack[backgroundPidTop], Commands[currCommand].arguments[t]);
-                }
-
-                backgroundPidTop++;
+                fgPid = pid;
+                waitpid(pid, &status, 0);
+                fgPid = 0;
             }
 
             else
-                waitpid(pid, &status, 0);
+            {
+                addJob(pid, Commands[currCommand].command);
+            }
         }
 
         else

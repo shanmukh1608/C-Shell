@@ -21,6 +21,13 @@
 #include "history.h"
 #include "nightswatch.h"
 
+void basicHandler(int sig)
+{
+    printf("\n");
+    if (fgPid)
+        kill(fgPid, sig);
+}
+
 char state;
 int vm_result;
 char shellPWD[1024];
@@ -157,6 +164,11 @@ void commandLoop()
 
 int main()
 {
+    signal(SIGINT, basicHandler);
+    signal(SIGQUIT, basicHandler);
+    signal(SIGTSTP, basicHandler);
+    fgPid=0;
+
     if (getcwd(shellHome, sizeof(shellHome)) != NULL)
         ;
     else

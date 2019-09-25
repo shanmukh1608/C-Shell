@@ -23,11 +23,7 @@ extern pid_t mainPID;
 extern pid_t pidStack[1024];
 extern char processStack[1024][1024];
 extern pid_t pidTop;
-
-extern pid_t backgroundPidStack[1024];
-extern int backgroundStatusStack[1024];
-extern char backgroundProcessStack[1024][1024];
-extern pid_t backgroundPidTop;
+int fgPid;
 
 extern char pipeSeparated[1024][1024];
 extern int pipeIndex;
