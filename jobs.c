@@ -27,3 +27,15 @@ void jobs()
     }
 
 }
+
+void kjob()
+{
+    int jobNo=atoi(Commands[currCommand].arguments[0]);
+    pid_t pid=backgroundPidStack[jobNo-1];
+
+    int signal=atoi(Commands[currCommand].arguments[1]);
+    
+    if (kill(pid, signal))
+        perror("kjob: ");
+}
+

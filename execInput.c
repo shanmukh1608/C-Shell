@@ -88,6 +88,8 @@ void execCommand()
         unsetEnv();
     else if (!strcmp(Commands[currCommand].command, "jobs"))
         jobs();
+    else if (!strcmp(Commands[currCommand].command, "kjob"))
+        kjob();
     else if (!strcmp(Commands[currCommand].command, "exit"))
         exit(0);
     else
