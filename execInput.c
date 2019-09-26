@@ -14,6 +14,7 @@
 #include <signal.h>
 #include "globals.h"
 #include "jobs.h"
+#include "cronjob.h"
 
 char *buf[1024];
 
@@ -93,6 +94,8 @@ void execCommand()
         fg();
     else if (!strcmp(Commands[currCommand].command, "bg"))
         bg();
+    else if (!strcmp(Commands[currCommand].command, "cronjob"))
+        cronjob();
     else if (!strcmp(Commands[currCommand].command, "quit"))
         exit(0);
     else
@@ -123,12 +126,45 @@ void execCommand()
                 fgPid = pid;
                 waitpid(pid, &status, WUNTRACED);
                 if (WIFSTOPPED(status))
-                    addJob(pid, Commands[currCommand].command);
+                {
+                    char stringToAdd[500];
+                    strcpy(stringToAdd, Commands[currCommand].command);
+                    strcat(stringToAdd, " ");
+                    for (int i = 0; i < Commands[currCommand].flagsIndex; i++)
+                    {
+                        strcat(stringToAdd, Commands[currCommand].flags[i]);
+                        strcat(stringToAdd, " ");
+                    }
+
+                    for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
+                    {
+                        strcat(stringToAdd, Commands[currCommand].arguments[i]);
+                        strcat(stringToAdd, " ");
+                    }
+                    addJob(pid, stringToAdd);
+                }
                 fgPid = 0;
             }
 
             else
-                addJob(pid, Commands[currCommand].command);
+            {
+                char stringToAdd[500];
+                strcpy(stringToAdd, Commands[currCommand].command);
+                strcat(stringToAdd, " ");
+                for (int i = 0; i < Commands[currCommand].flagsIndex; i++)
+                {
+                    strcat(stringToAdd, Commands[currCommand].flags[i]);
+                    strcat(stringToAdd, " ");
+                }
+
+                for (int i = 0; i < Commands[currCommand].argumentsIndex; i++)
+                {
+                    strcat(stringToAdd, Commands[currCommand].arguments[i]);
+                    strcat(stringToAdd, " ");
+                }
+
+                addJob(pid, stringToAdd);
+            }
         }
 
         else
