@@ -15,7 +15,6 @@
 #include "globals.h"
 #include "jobs.h"
 
-
 char *buf[1024];
 
 void procExit()
@@ -36,7 +35,6 @@ void procExit()
         }
     }
 }
-
 
 int createBuf()
 {
@@ -123,14 +121,14 @@ void execCommand()
             if (!Commands[currCommand].backgroundFlag)
             {
                 fgPid = pid;
-                waitpid(pid, &status, 0);
+                waitpid(pid, &status, WUNTRACED);
+                if (WIFSTOPPED(status))
+                    addJob(pid, Commands[currCommand].command);
                 fgPid = 0;
             }
 
             else
-            {
                 addJob(pid, Commands[currCommand].command);
-            }
         }
 
         else

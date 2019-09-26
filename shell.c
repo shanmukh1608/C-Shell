@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <termios.h> 
 #include <errno.h>
 #include <dirent.h>
 #include "input.h"
@@ -90,6 +91,8 @@ void prompt()
 
 void commandLoop()
 {
+    struct termios new_termios;
+    new_termios.c_cc[VEOF] = 4;
     savestdin = dup(0);
     savestdout = dup(1);
     while (1)
@@ -167,7 +170,7 @@ int main()
     signal(SIGINT, basicHandler);
     signal(SIGQUIT, basicHandler);
     signal(SIGTSTP, basicHandler);
-    fgPid=0;
+    fgPid = 0;
 
     if (getcwd(shellHome, sizeof(shellHome)) != NULL)
         ;
