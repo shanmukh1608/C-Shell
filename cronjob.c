@@ -62,8 +62,8 @@ void cronjob()
     till = atoi(tillString);
 
     // printf("command=%s\n", command);
-
     int pid = fork();
+
     if (pid == 0)
     {
         signal(SIGINT, SIG_DFL);
@@ -87,8 +87,8 @@ void cronjob()
         }
         exit(0);
     }
-    else
+    else if (pid<0)
     {
-        waitpid(pid, NULL, 0);
+        printf("Fork error\n");
     }
 }

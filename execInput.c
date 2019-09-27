@@ -59,18 +59,61 @@ void executeUp()
     char command[200];
 
     fgets(line, sizeof(line), fp);
-    sprintf(command,"%s", line);
-    strcpy(currInput, command);
-    if (currInput[strlen(currInput)-1]=='\n')
-        currInput[strlen(currInput)-1]='\0';
+    sprintf(command, "%s", line);
+    strcpy(input, command);
+    if (input[strlen(input) - 1] == '\n')
+        input[strlen(input) - 1] = '\0';
     prompt();
     printf("\033[0;1;34m%s\033[0m", shellPrompt);
-    printf("%s\n", currInput);
+    printf("%s\n", input);
 
-    parseInput();
-    execCommand();
-    
+    char inputCopy[1024];
+    strcpy(inputCopy, input);
+    sepInput = strtok(input, ";");
+
+    while (sepInput != NULL)
+    {
+        writeToHistory(inputCopy); //copy because input has been tokenized
+
+        if (!strcmp(sepInput, ""))
+            continue;
+        pipeIndex = 0;
+        strcpy(pipeSeparated[0], "");
+        separatePipes();
+
+        for (currCommand = 0; currCommand <= pipeIndex; currCommand++)
+        {
+            currInput = (char *)malloc(1024);
+            strcpy(currInput, pipeSeparated[currCommand]);
+            if (!parseInput())
+                Commands[currCommand].errorFlag = 1;
+        }
+
+        for (currCommand = 0; currCommand <= pipeIndex; currCommand++)
+        {
+            if (pipeIndex == 0)
+            {
+                dup2(Commands[currCommand].inputFd, STDIN_FILENO);
+                dup2(Commands[currCommand].outputFd, STDOUT_FILENO);
+                execCommand();
+                dup2(savestdin, STDIN_FILENO);
+                dup2(savestdout, STDOUT_FILENO);
+            }
+            else if (currCommand != pipeIndex)
+                execPipe();
+            else
+            {
+                dup2(Commands[currCommand].outputFd, 1);
+                execCommand();
+            }
+        }
+
+        dup2(savestdin, STDIN_FILENO);
+        dup2(savestdout, STDOUT_FILENO);
+        sepInput = strtok(NULL, ";");
+    }
 }
+
 void procExit()
 {
     int status;
@@ -154,11 +197,12 @@ void execCommand()
     else
     {
         int status;
-        signal(SIGCHLD, procExit);
+        // signal(SIGCHLD, procExit);
         pid_t pid = fork();
         if (pid == 0)
         {
             setpgid(0, 0);
+
             createBuf();
             if (currCommand == 0)
                 dup2(Commands[currCommand].inputFd, 0);

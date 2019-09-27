@@ -8,7 +8,6 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <termios.h>
 #include <errno.h>
 #include <dirent.h>
 #include "input.h"
@@ -24,7 +23,6 @@
 
 void basicHandler(int sig)
 {
-    printf("\n");
     if (fgPid)
         kill(fgPid, sig);
 }
@@ -91,8 +89,6 @@ void prompt()
 
 void commandLoop()
 {
-    struct termios new_termios;
-    new_termios.c_cc[VEOF] = 4;
     savestdin = dup(0);
     savestdout = dup(1);
     while (1)
@@ -147,6 +143,12 @@ void commandLoop()
 
             for (currCommand = 0; currCommand <= pipeIndex; currCommand++)
             {
+                if (Commands[currCommand].errorFlag)
+                {
+                    printf("Input file doesn't exist\n");
+                    continue;
+                }
+
                 if (pipeIndex == 0)
                 {
                     dup2(Commands[currCommand].inputFd, STDIN_FILENO);
