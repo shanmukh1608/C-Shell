@@ -55,14 +55,14 @@ void jobs()
             strcpy(procString, "");
             read(fd, procString, 500);
             close(fd);
-            int j=0, count=0;
-            while (j<500 && count <2)
+            int j = 0, count = 0;
+            while (j < 500 && count < 2)
             {
-                if (procString[j]==' ')
+                if (procString[j] == ' ')
                     count++;
                 j++;
             }
-            if (procString[j]=='S'||procString[j]=='R')
+            if (procString[j] == 'S' || procString[j] == 'R')
                 strcpy(status, "Running");
             else
                 strcpy(status, "Stopped");
@@ -73,7 +73,7 @@ void jobs()
             strcpy(status, "Unknown");
         }
 
-        printf("[%d] %s %s [%d]\n", i+1, status, jobsArray[i].command, jobsArray[i].pid);
+        printf("[%d] %s %s [%d]\n", i + 1, status, jobsArray[i].command, jobsArray[i].pid);
     }
 }
 
@@ -109,10 +109,16 @@ void fg()
     fgPid = jobsArray[jobNo].pid;
 
     int status;
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+    tcsetpgrp(STDIN_FILENO, jobsArray[jobNo].pid);
     waitpid(jobsArray[jobNo].pid, &status, WUNTRACED);
     fgPid = 0;
     if (WIFSTOPPED(status))
         addJob(jobsArray[jobNo].pid, jobsArray[jobNo].command);
+    tcsetpgrp(STDIN_FILENO, getpgrp());
+    signal(SIGTTIN, SIG_DFL);
+    signal(SIGTTOU, SIG_DFL);
     signal(SIGCHLD, procExit);
 }
 

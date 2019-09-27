@@ -196,11 +196,12 @@ void execCommand()
         exit(0);
     else
     {
+        
         int status;
-        // signal(SIGCHLD, procExit);
         pid_t pid = fork();
         if (pid == 0)
         {
+            signal(SIGCHLD, procExit);
             setpgid(0, 0);
 
             createBuf();
@@ -221,6 +222,9 @@ void execCommand()
             if (!Commands[currCommand].backgroundFlag)
             {
                 fgPid = pid;
+                signal(SIGTTIN, SIG_IGN);
+                signal(SIGTTOU, SIG_IGN);
+                tcsetpgrp(STDIN_FILENO, pid);
                 waitpid(pid, &status, WUNTRACED);
                 if (WIFSTOPPED(status))
                 {
@@ -240,6 +244,10 @@ void execCommand()
                     }
                     addJob(pid, stringToAdd);
                 }
+                tcsetpgrp(STDIN_FILENO, getpgrp());
+                signal(SIGTTIN, SIG_DFL);
+                signal(SIGTTOU, SIG_DFL);
+
                 fgPid = 0;
             }
 

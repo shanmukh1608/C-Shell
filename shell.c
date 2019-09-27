@@ -23,6 +23,7 @@
 
 void basicHandler(int sig)
 {
+    printf("\n");
     if (fgPid)
         kill(fgPid, sig);
 }
@@ -103,7 +104,8 @@ void commandLoop()
         while (1)
         {
             char ch;
-            scanf("%c", &ch);
+            // scanf("%c", &ch);
+            ch = getc(stdin);
             if (ch == '\n')
                 break;
 
@@ -178,6 +180,7 @@ int main()
     signal(SIGINT, basicHandler);
     signal(SIGQUIT, basicHandler);
     signal(SIGTSTP, basicHandler);
+
     fgPid = 0;
 
     if (getcwd(shellHome, sizeof(shellHome)) != NULL)
