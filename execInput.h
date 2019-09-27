@@ -3,6 +3,8 @@
 
 void procExit();
 void execCommand();
+void executeUp();
+
 void execPipe();
 void execLastPipe();
 

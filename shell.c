@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <termios.h> 
+#include <termios.h>
 #include <errno.h>
 #include <dirent.h>
 #include "input.h"
@@ -115,6 +115,12 @@ void commandLoop()
             cToStr[1] = '\0';
             cToStr[0] = ch;
             strcat(input, cToStr);
+        }
+
+        if (strstr(input, "\033"))
+        {
+            executeUp();
+            continue;
         }
 
         char inputCopy[1024];

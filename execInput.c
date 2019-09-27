@@ -18,6 +18,59 @@
 
 char *buf[1024];
 
+void executeUp()
+{
+    int count = 0;
+    for (int i = 0; i < strlen(input); i++)
+        if (input[i] == '\033')
+            count++;
+
+    int numHist = 0;
+    char *historyFile = (char *)malloc(1024 * sizeof(char));
+    strcpy(historyFile, shellHome);
+    strcat(historyFile, "/");
+    strcat(historyFile, ".history.txt");
+
+    FILE *fp = fopen(historyFile, "r");
+    char chr = getc(fp);
+    while (chr != EOF)
+    {
+        if (chr == '\n')
+            numHist++;
+        chr = getc(fp);
+    }
+
+    fseek(fp, 0, SEEK_SET);
+    char line[1024];
+
+    if (count > numHist)
+    {
+        printf("Error: History doesn't have those many commands.\n");
+        return;
+    }
+
+    else if (numHist > count)
+    {
+        int i = 0;
+        while (i < (numHist - count))
+            fgets(line, sizeof(line), fp), i++;
+    }
+
+    char command[200];
+
+    fgets(line, sizeof(line), fp);
+    sprintf(command,"%s", line);
+    strcpy(currInput, command);
+    if (currInput[strlen(currInput)-1]=='\n')
+        currInput[strlen(currInput)-1]='\0';
+    prompt();
+    printf("\033[0;1;34m%s\033[0m", shellPrompt);
+    printf("%s\n", currInput);
+
+    parseInput();
+    execCommand();
+    
+}
 void procExit()
 {
     int status;
