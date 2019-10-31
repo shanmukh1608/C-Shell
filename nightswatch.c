@@ -49,7 +49,7 @@ void nonblock(int state)
 void nightswatch()
 {
     char timestr[10];
-    int i = 0;
+    size_t i = 0;
 
     while (!isDigit(flags[i]))
         i++;

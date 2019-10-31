@@ -19,7 +19,6 @@ void proc_info()
     char *filelink;
     filelink = (char *)malloc(1024);
     strcat(filelink, "/proc/");
-    char pid_string[1024];
 
     if (strcmp(arguments, ""))
         strcat(filelink, arguments);
@@ -35,7 +34,7 @@ void proc_info()
     char line[1024];
 
     fgets(line, 1024, file);
-    int count = 1, i = 0;
+    size_t count = 1, i = 0;
 
     while (count < 3 && i < strlen(line))
     {

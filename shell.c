@@ -60,12 +60,12 @@ void prompt()
 
         else if (strstr(shellPWD, shellHome)) //at subdirectory of home
         {
-            char *temp = malloc(strlen(shellPWD));
+            char *temp = (char*)malloc(strlen(shellPWD));
             strcpy(temp, shellPWD);
             strcpy(shellPWD, "~");
             int homeLength = strlen(shellHome);
             // printf("Shellhome=%s, homelength=%d, temp=%s, templength=%d", shellHome, homeLength, temp, strlen(temp));
-            for (int i = homeLength; i < strlen(temp); i++)
+            for (size_t i = homeLength; i < strlen(temp); i++)
                 shellPWD[i - homeLength + 1] = temp[i];
             shellPWD[strlen(temp) - homeLength + 1] = '\0';
             free(temp);

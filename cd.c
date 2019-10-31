@@ -21,7 +21,7 @@ void cd()
 
     if (arguments[0] == '~')
     {
-        for (int i = 0; i < strlen(arguments) - 1; i++)
+        for (unsigned long i = 0; i < strlen(arguments) - 1; i++)
             arguments[i] = arguments[i + 1];
         arguments[strlen(arguments) - 1] = '\0';
 
