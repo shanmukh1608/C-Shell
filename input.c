@@ -21,7 +21,8 @@ char *currCommand;
 
 void parseInput()
 {
-    int i = 0, j = 0;
+    size_t i = 0;
+    int j = 0;
 
     command = (char *)malloc(1024 * sizeof(char));
     flags = (char *)malloc(1024 * sizeof(char));
@@ -42,7 +43,7 @@ void parseInput()
     while (i < strlen(currCommand) && currCommand[i] == ' ')
         i++;
 
-    int curr = i;
+    size_t curr = i;
     while (i < strlen(currCommand))
     {
         if (i == curr)
@@ -72,7 +73,7 @@ void parseInput()
     flags[strlen(flags) - 1] = '\0';
     backgroundFlag = 0;
 
-    int end;
+    size_t end;
     for (end = strlen(currCommand) - 1; end >= i && (currCommand[end] == ' ' || currCommand[end] == '&'); end--)
         if (currCommand[end] == '&')
             backgroundFlag = 1;

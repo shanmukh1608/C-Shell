@@ -39,7 +39,7 @@ void full_ls_file(char *filename, int a, int max)
     grp = getgrgid(fileStat.st_gid);
     pwd = getpwuid(fileStat.st_uid);
     time_t *t;
-    t = malloc(1024);
+    t = (time_t*)malloc(1024);
     *t = fileStat.st_mtime;
     struct tm tm = *localtime(t);
     Mon(tm.tm_mon + 1);
@@ -105,7 +105,7 @@ void ls()
 
     else if (arguments[0] == '~')
     {
-        for (int i = 0; i < strlen(arguments) - 1; i++)
+        for (unsigned long i = 0; i < strlen(arguments) - 1; i++)
             arguments[i] = arguments[i + 1];
         arguments[strlen(arguments) - 1] = '\0';
 
