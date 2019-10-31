@@ -15,7 +15,7 @@
 #include <grp.h>
 #include <pwd.h>
 
-void full_ls_file(char *filename, int a, int max)
+void full_ls_file(char *filename, int max)
 {
     struct stat fileStat;
 
@@ -72,7 +72,7 @@ void full_ls(int a)
     {
         if ((isHiddenFile(curfile->d_name)) && (!a))
             continue;
-        full_ls_file(curfile->d_name, a, max);
+        full_ls_file(curfile->d_name, max);
     }
     chdir(cwd);
 }
@@ -136,7 +136,7 @@ void ls()
     }
     else if (isFile(arguments))
         if (l)
-            full_ls_file(arguments, a, 10);
+            full_ls_file(arguments, 10);
         else
             printf("%s\n", arguments);
     else
