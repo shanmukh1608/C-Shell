@@ -98,7 +98,6 @@ void nightswatch()
                 i++;
 
             long long int cpu0, cpu1, cpu2, cpu3, cpu4, cpu5, cpu6, cpu7;
-            // printf("%s\n", line);
 
             sscanf(line, "%*lld: %lld %lld %lld %lld %lld %lld %lld %lld", &cpu0, &cpu1, &cpu2, &cpu3, &cpu4, &cpu5, &cpu6, &cpu7);
 
