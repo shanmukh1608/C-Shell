@@ -43,7 +43,6 @@ int execInput()
     pid_t pid = fork();
     if (pid == 0)
     {
-        // printf("%s\n%s\n%s\n", command, flags, arguments);
         char *buf[1024];
         buf[0] = (char *)malloc(1024);
         strcpy(buf[0], command);

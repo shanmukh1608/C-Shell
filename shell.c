@@ -64,7 +64,6 @@ void prompt()
             strcpy(temp, shellPWD);
             strcpy(shellPWD, "~");
             int homeLength = strlen(shellHome);
-            // printf("Shellhome=%s, homelength=%d, temp=%s, templength=%d", shellHome, homeLength, temp, strlen(temp));
             for (int i = homeLength; i < strlen(temp); i++)
                 shellPWD[i - homeLength + 1] = temp[i];
             shellPWD[strlen(temp) - homeLength + 1] = '\0';

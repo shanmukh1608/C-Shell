@@ -99,7 +99,6 @@ void writeToHistory(char *inputCopy)
 
         for (int i = 1; i < 20; i++)
             fprintf(fp, "%s", buffer[i]);
-        // printf("old=%s, new=%s\n", historyFile, newHistoryFile);
     }
 
     fprintf(fp, "%s\n", inputCopy);

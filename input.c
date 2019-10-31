@@ -85,6 +85,4 @@ void parseInput()
         strcat(arguments, cToStr);
         i++;
     }
-
-    // printf("%s\n%s\n%s\n%d\n", command, flags, arguments, backgroundFlag);
 }
