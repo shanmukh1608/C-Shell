@@ -134,9 +134,7 @@ void commandLoop()
 
 int main()
 {
-    if (getcwd(shellHome, sizeof(shellHome)) != NULL)
-        ;
-    else
+    if (getcwd(shellHome, sizeof(shellHome)) == NULL)
     {
         perror("getcwd() error");
         return 1;
